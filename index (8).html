@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <title>إدارة أمن المجموعة - المقدم / محمد مسعد</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --gold: #d97706;
+            --bg: #f1f5f9;
+            --card: rgba(255, 255, 255, 0.94);
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 45px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* العلامة المائية الشفافة للنسر الذهبي داخل درع الحماية */
+        .watermark-container {
+            position: fixed;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 360px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.085;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header, .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #ffffff;
+            padding: 18px 16px 24px;
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.18);
+            user-select: none;
+        }
+        .badge-id {
+            display: inline-block;
+            background: rgba(217, 119, 6, 0.25);
+            border: 1px solid rgba(251, 191, 36, 0.45);
+            color: #fcd34d;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 16px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+        .header h1 { font-size: 20px; font-weight: 800; }
+        .header p { font-size: 13px; color: #cbd5e1; margin-top: 2px; }
+        .live-clock {
+            margin-top: 8px;
+            display: inline-block;
+            background: rgba(15, 23, 42, 0.55);
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #93c5fd;
+            font-weight: 700;
+        }
+
+        .container { max-width: 620px; margin: 0 auto; padding: 0 14px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: -15px;
+            margin-bottom: 16px;
+        }
+        .stat-card {
+            background: var(--card);
+            padding: 12px 6px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+        .stat-label { font-size: 11px; color: var(--muted); display: block; font-weight: 600; }
+        .stat-value { font-size: 14px; font-weight: 800; color: var(--primary); }
+
+        .tip-card {
+            background: linear-gradient(135deg, rgba(255, 251, 235, 0.96) 0%, rgba(254, 243, 199, 0.96) 100%);
+            border: 1px solid #fcd34d;
+            border-right: 5px solid var(--warning);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 16px;
+        }
+        .tip-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 4px; }
+        .tip-text { font-size: 13.5px; color: #78350f; font-weight: 600; }
+
+        .section-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 18px 15px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
+        }
+        .section-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; margin-top: 10px; }
+
+        select, textarea, input {
+            width: 100%;
+            padding: 11px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            background-color: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            outline: none;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .days-badge {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            color: #1e40af;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .scenario-box {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            border-right: 4px solid var(--primary);
+            margin-bottom: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14.5px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #fff;
+        }
+        .btn-blue { background: var(--accent); }
+        .btn-green { background: var(--success); }
+        .btn-amber { background: var(--gold); }
+        .btn-red { background: var(--danger); }
+        .btn-dark { background: var(--primary); }
+        .btn-sm { padding: 7px 12px; font-size: 12.5px; width: auto; margin-top: 6px; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        .msg-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+        }
+        .msg-success { background: #dcfce7; color: #166534; display: block; }
+        .msg-loading { background: #e0f2fe; color: #075985; display: block; }
+        .msg-error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* لوحة تحكم مدير الأمن */
+        .admin-view { display: none; }
+        .admin-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fee2e2;
+            border: 1.5px solid #fca5a5;
+            padding: 10px 14px;
+            border-radius: 14px;
+            margin-top: -12px;
+            margin-bottom: 14px;
+        }
+        .tabs-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .tab-btn {
+            padding: 10px 6px;
+            background: #e2e8f0;
+            color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .list-item {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .badge-in { background: #dcfce7; color: #166534; }
+        .badge-out { background: #fef3c7; color: #92400e; }
+        .badge-abs { background: #fee2e2; color: #991b1b; }
+        .badge-wait { background: #e0f2fe; color: #075985; }
+    </style>
+</head>
+<body>
+
+    <!-- العلامة المائية الشفافة: النسر الذهبي داخل درع الحماية -->
+    <div class="watermark-container" aria-hidden="true">
+        <svg viewBox="0 0 300 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#b45309" />
+                    <stop offset="50%" stop-color="#d97706" />
+                    <stop offset="100%" stop-color="#78350f" />
+                </linearGradient>
+            </defs>
+            <!-- درع الحماية الخارجي -->
+            <path d="M150 12 L272 56 L272 162 C272 242 218 298 150 328 C82 298 28 242 28 162 L28 56 Z"
+                  fill="none" stroke="url(#goldGrad)" stroke-width="10" />
+            <!-- درع داخلي -->
+            <path d="M150 26 L258 65 L258 160 C258 232 210 284 150 312 C90 284 42 232 42 160 L42 65 Z"
+                  fill="url(#goldGrad)" fill-opacity="0.18" stroke="url(#goldGrad)" stroke-width="3" />
+            <!-- النسر الذهبي بأجنحة مفرودة -->
+            <g fill="url(#goldGrad)">
+                <!-- رأس النسر -->
+                <path d="M150 74 C162 74 170 82 170 93 C170 99 166 105 160 108 L164 118 L136 118 L140 108 C134 105 130 99 130 93 C130 82 138 74 150 74 Z" />
+                <!-- منقار -->
+                <path d="M167 88 L178 92 L168 97 Z" />
+                <!-- الجناح الأيمن -->
+                <path d="M166 116 C198 102 232 86 248 76 C242 98 228 112 208 120 C226 118 238 112 244 108 C236 126 218 138 196 142 C214 143 226 140 232 136 C222 152 202 160 176 160 L166 146 Z" />
+                <!-- الجناح الأيسر -->
+                <path d="M134 116 C102 102 68 86 52 76 C58 98 72 112 92 120 C74 118 62 112 56 108 C64 126 82 138 104 142 C86 143 74 140 68 136 C78 152 98 160 124 160 L134 146 Z" />
+                <!-- صدر ودرع النسر -->
+                <path d="M132 120 L168 120 L172 174 C172 196 150 212 150 212 C150 212 128 196 128 174 Z" />
+                <!-- خطوط الصدر -->
+                <rect x="140" y="132" width="4" height="52" fill="#ffffff" fill-opacity="0.55" />
+                <rect x="148" y="132" width="4" height="58" fill="#ffffff" fill-opacity="0.55" />
+                <rect x="156" y="132" width="4" height="52" fill="#ffffff" fill-opacity="0.55" />
+                <!-- ذيل النسر -->
+                <path d="M136 214 L164 214 L174 252 L150 242 L126 252 Z" />
+                <!-- المخالب -->
+                <path d="M126 196 L108 214 L118 220 L132 206 Z" />
+                <path d="M174 196 L192 214 L182 220 L168 206 Z" />
+            </g>
+            <!-- نجوم أعلى الدرع -->
+            <circle cx="150" cy="48" r="4" fill="url(#goldGrad)" />
+            <circle cx="132" cy="52" r="3" fill="url(#goldGrad)" />
+            <circle cx="168" cy="52" r="3" fill="url(#goldGrad)" />
+        </svg>
+    </div>
+
+    <header class="header">
+        <span class="badge-id" onclick="unlockAdmin()">ADM-001</span>
+        <h1>المقدم / محمد مسعد</h1>
+        <p>مدير أمن المجموعة | 5 مواقع | 80 فرداً</p>
+        <div class="live-clock" id="liveClock">جاري تحميل التاريخ والوقت...</div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- أولاً: واجهة الأفراد والمشرفين              -->
+    <!-- ========================================== -->
+    <main class="container" id="staffView">
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">إجمالي القوة</span>
+                <span class="stat-value">80 فرداً</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">المواقع</span>
+                <span class="stat-value">5 مواقع</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">الوردية الحالية</span>
+                <span class="stat-value" id="currentShiftBadge" style="color:#d97706;">☀️ صباحي</span>
+            </div>
+        </section>
+
+        <!-- النصيحة اليومية -->
+        <section class="tip-card">
+            <div class="tip-title">💡 توجيه ونصيحة مدير الأمن اليومية:</div>
+            <div class="tip-text" id="dailyTip">جاري تحميل توجيهات اليوم...</div>
+            <button class="btn btn-amber btn-sm" id="btnConfirmTip" onclick="confirmTipRead()">✔️ تم الاطلاع والالتزام بالتوجيه</button>
+        </section>
+
+        <!-- تسجيل الحضور والانصراف الفعلي -->
+        <section class="section-card">
+            <h2 class="section-title">📋 تسجيل الحضور والانصراف الفعلي</h2>
+
+            <label>1. اختر الموقع:</label>
+            <select id="siteSelect" onchange="populateStaffDropdown()">
+                <option value="الهمبرا 1">الهمبرا 1</option>
+                <option value="الهمبرا 2">الهمبرا 2</option>
+                <option value="الهمبرا 3">الهمبرا 3</option>
+                <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+            </select>
+
+            <label>2. اختر الوردية:</label>
+            <select id="shiftSelect">
+                <option value="صباحي (8 ص - 8 م)">☀️ وردية صباحي (من 8 صباحاً حتى 8 مساءً)</option>
+                <option value="ليلي (8 م - 8 ص)">🌙 وردية ليلي (من 8 مساءً حتى 8 صباحاً)</option>
+            </select>
+
+            <label>3. اختر اسمك وكودك:</label>
+            <select id="employeeSelect" onchange="onEmployeeChange()">
+                <option value="">-- اختر الاسم والكود --</option>
+            </select>
+
+            <div class="row-2">
+                <button class="btn btn-blue" id="btnCheckIn" onclick="registerAttendance('حضور')">🟢 تسجيل حضور</button>
+                <button class="btn btn-amber" id="btnCheckOut" onclick="registerAttendance('انصراف')">🔴 تسجيل انصراف</button>
+            </div>
+            <div id="attendanceMsg" class="msg-status"></div>
+        </section>
+
+        <!-- قسم مراجعة إجازات الأفراد (يظهر للمشرف فقط عند اختيار اسمه) -->
+        <section class="section-card" id="supervisorLeaveBox" style="display:none; border: 2px solid #93c5fd; background: #eff6ff;">
+            <h2 class="section-title" style="color: #1e40af;">🛡️ مراجعة طلبات إجازات أفراد الموقع (للمشرف)</h2>
+            <p style="font-size: 12px; color: #1e3a8a; margin-bottom: 10px;">ملاحظة: لا يُسمح للمشرف بالموافقة على إجازته الشخصية، وتُرفع إجازة المشرف لسيادة المقدم مباشرة.</p>
+            <div id="supervisorLeaveList"></div>
+        </section>
+
+        <!-- طلب إجازة اعتيادية -->
+        <section class="section-card">
+            <h2 class="section-title">🗓️ تقديم طلب إجازة اعتيادية</h2>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 6px;">اختر موقعك واسمك من قسم الحضور أعلاه ثم حدد فترة الإجازة:</p>
+
+            <div class="row-2">
+                <div>
+                    <label>من تاريخ:</label>
+                    <input type="date" id="leaveFromDate" onchange="calculateLeaveDays()">
+                </div>
+                <div>
+                    <label>إلى تاريخ:</label>
+                    <input type="date" id="leaveToDate" onchange="calculateLeaveDays()">
+                </div>
+            </div>
+
+            <div class="days-badge" id="leaveDaysDisplay">مدة الإجازة: حدد تاريخ البداية والنهاية</div>
+
+            <label>سبب طلب الإجازة الاعتيادية:</label>
+            <textarea id="leaveReason" placeholder="اكتب سبب الإجازة باختصار..."></textarea>
+
+            <button class="btn btn-dark" id="btnSubmitLeave" onclick="submitLeaveRequest()">📩 إرسال طلب الإجازة الاعتيادية</button>
+            <div id="leaveMsg" class="msg-status"></div>
+        </section>
+
+        <!-- اختبار المواقف الأمنية -->
+        <section class="section-card">
+            <h2 class="section-title">🎯 اختبار المواقف الأمنية (تقييم الأداء)</h2>
+            <div class="scenario-box" id="dailyScenario">جاري تحميل موقف اليوم...</div>
+
+            <label>اكتب تصرفك ورد فعلك في هذا الموقف:</label>
+            <textarea id="scenarioResponse" placeholder="اكتب خطوات تصرفك هنا بالتفصيل..."></textarea>
+
+            <button class="btn btn-green" id="btnScenario" onclick="sendScenarioAnswer()">📤 إرسال الإجابة لمدير الأمن</button>
+            <div id="scenarioMsg" class="msg-status"></div>
+        </section>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- ثانياً: الصفحة الخاصة بمدير الأمن فقط      -->
+    <!-- ========================================== -->
+    <main class="container admin-view" id="adminView">
+        <div class="admin-top-bar">
+            <span style="font-size:13px; font-weight:800; color:#991b1b;">🔐 لوحة تحكم المقدم / محمد مسعد</span>
+            <button class="btn btn-dark btn-sm" style="margin:0;" onclick="backToStaffView()">⬅️ رجوع لواجهة الأفراد والمشرفين</button>
+        </div>
+
+        <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchAdminTab('tabReport', this)">📊 الحضور والغياب</button>
+            <button class="tab-btn" onclick="switchAdminTab('tabLeaves', this)">🗓️ اعتماد الإجازات</button>
+            <button class="tab-btn" onclick="switchAdminTab('tabManage', this)">👥 القوة والتوجيهات</button>
+        </div>
+
+        <!-- تبويب 1: تقارير الحضور والانصراف والغياب -->
+        <div class="tab-content active" id="tabReport">
+            <section class="section-card">
+                <h2 class="section-title">📊 تقرير الحضور والانصراف والغياب اليومي</h2>
+                <div class="row-2">
+                    <div>
+                        <label>اختر الموقع:</label>
+                        <select id="reportSiteFilter" onchange="renderAttendanceReport()">
+                            <option value="الكل">جميع المواقع (5)</option>
+                            <option value="الهمبرا 1">الهمبرا 1</option>
+                            <option value="الهمبرا 2">الهمبرا 2</option>
+                            <option value="الهمبرا 3">الهمبرا 3</option>
+                            <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                            <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>التاريخ:</label>
+                        <input type="date" id="reportDateFilter" onchange="renderAttendanceReport()">
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-top:14px;">
+                    <div class="stat-card">
+                        <span class="stat-label">إجمالي القوة</span>
+                        <span class="stat-value" id="repTotal">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">الحضور الفعلي</span>
+                        <span class="stat-value" style="color:var(--success);" id="repPresent">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">الغياب</span>
+                        <span class="stat-value" style="color:var(--danger);" id="repAbsent">0</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-blue btn-sm" onclick="loadAllDataFromServer()">🔄 تحديث البيانات الآن</button>
+                <div id="reportDetailsList" style="margin-top:12px;"></div>
+            </section>
+        </div>
+
+        <!-- تبويب 2: اعتماد الإجازات الاعتيادية -->
+        <div class="tab-content" id="tabLeaves">
+            <section class="section-card">
+                <h2 class="section-title">🗓️ طلبات الإجازات الاعتيادية (الاعتماد النهائي)</h2>
+                <button class="btn btn-blue btn-sm" onclick="loadAllDataFromServer()">🔄 تحديث الطلبات</button>
+                <div id="adminLeavesList" style="margin-top:12px;"></div>
+            </section>
+        </div>
+
+        <!-- تبويب 3: إضافة/حذف الأفراد وتحديث التوجيهات -->
+        <div class="tab-content" id="tabManage">
+            <section class="section-card">
+                <h2 class="section-title">➕ إضافة فرد أمن أو مشرف وتوليد كود</h2>
+                <label>الاسم الكامل:</label>
+                <input type="text" id="newStaffName" placeholder="اكتب اسم الفرد أو المشرف...">
+
+                <div class="row-2">
+                    <div>
+                        <label>الصفة:</label>
+                        <select id="newStaffRole">
+                            <option value="فرد أمن">فرد أمن (SEC)</option>
+                            <option value="مشرف">مشرف موقع (SUP)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>الموقع:</label>
+                        <select id="newStaffSite">
+                            <option value="الهمبرا 1">الهمبرا 1</option>
+                            <option value="الهمبرا 2">الهمبرا 2</option>
+                            <option value="الهمبرا 3">الهمبرا 3</option>
+                            <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                            <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-green" id="btnAddStaff" onclick="addNewStaff()">✅ إضافة وتوليد الكود تلقائياً</button>
+                <div id="addStaffMsg" class="msg-status"></div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">🗑️ قائمة القوة المسجلة (حذف فرد أو مشرف)</h2>
+                <select id="manageSiteFilter" onchange="renderStaffManageList()">
+                    <option value="الكل">عرض كل المواقع</option>
+                    <option value="الهمبرا 1">الهمبرا 1</option>
+                    <option value="الهمبرا 2">الهمبرا 2</option>
+                    <option value="الهمبرا 3">الهمبرا 3</option>
+                    <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                    <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+                </select>
+                <div id="staffManageList" style="margin-top:10px;"></div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">📢 نشر توجيه أو موقف طارئ فوري</h2>
+                <label>النصيحة الطارئة:</label>
+                <textarea id="adminTipInput" placeholder="اتركه فارغاً لاستخدام البنك السنوي التلقائي..."></textarea>
+                <label>الموقف الطارئ:</label>
+                <textarea id="adminScenarioInput" placeholder="اتركه فارغاً لاستخدام البنك السنوي التلقائي..."></textarea>
+                <button class="btn btn-red" id="btnSaveSettings" onclick="saveEmergencySettings()">🚀 نشر التحديث للجميع الآن</button>
+                <div id="settingsMsg" class="msg-status"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweVVtQDZB9TuNNvXlyUKD9IaCOTh8e1MiksZeXQPr4cC2Y6NhSmbA0FmAgrwt14Pvm/exec";
+        const ADMIN_PIN = "2026";
+        const ADMIN_SECRET_KEY = "MS-2026-ADM";
+
+        let allStaff = [];
+        let allAttendance = [];
+        let allLeaves = [];
+
+        // تحديث الساعة والتاريخ الحي والوردية التلقائية
+        function updateClockAndShift() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('ar-EG', dateOptions);
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById("liveClock").textContent = `📅 ${dateStr} | ⏰ ${timeStr}`;
+
+            const hour = now.getHours();
+            const isDayShift = (hour >= 8 && hour < 20);
+            const badge = document.getElementById("currentShiftBadge");
+            badge.textContent = isDayShift ? "☀️ صباحي" : "🌙 ليلي";
+            badge.style.color = isDayShift ? "#d97706" : "#1e40af";
+        }
+        setInterval(updateClockAndShift, 1000);
+        updateClockAndShift();
+
+        // ضبط الوردية الافتراضية وتاريخ اليوم عند الفتح
+        window.onload = function() {
+            const now = new Date();
+            const hour = now.getHours();
+            document.getElementById("shiftSelect").value = (hour >= 8 && hour < 20) ? "صباحي (8 ص - 8 م)" : "ليلي (8 م - 8 ص)";
+            document.getElementById("reportDateFilter").value = now.toISOString().split('T')[0];
+
+            setAnnualDailyContent();
+            loadAllDataFromServer();
+        };
+
+        // محتوى سنوي متجدد تلقائياً على مدار 366 يوماً (بدون ذكر أجهزة اللاسلكي)
+        function setAnnualDailyContent() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const dayOfYear = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+
+            const annualTips = [
+                "اليقظة الدائمة على البوابات هي خط الدفاع الأول، لا تسمح بدخول أي زائر دون إثبات هوية وتسجيل بياناته.",
+                "المظهر المشرف والانضباط في التعامل مع النزلاء يعكس قوة واحترافية إدارة الأمن بالكامل.",
+                "تأكد من فحص الكشافات اليدوية وكاميرات المراقبة والإضاءة الخارجية قبل استلام الوردية.",
+                "الهدوء وضبط النفس عند التعامل مع المواقف الغاضبة يمنع تفاقم المشكلات ويحفظ سلامة الجميع.",
+                "المرور الدوري على النقاط الميتة والأسوار الخلفية لا يقل أهمية عن التواجد على البوابة الرئيسية.",
+                "التفتيش الدقيق للمركبات والحقائب وفق التعليمات يحمي الموقع من أي مخاطر محتملة.",
+                "الالتزام بمواعيد استلام وتسليم الورديات بدقة (8 صباحاً و8 مساءً) يضمن عدم وجود أي ثغرة أمنية.",
+                "مراقبة شاشات الكاميرات بتركيز مستمر والإبلاغ الفوري عن أي حركة مريبة في محيط الموقع.",
+                "التأكد من خلو مخارج الطوارئ وطفايات الحريق من أي عوائق على مدار الساعة.",
+                "حسن الاستقبال واللباقة مع النزلاء مع الحزم الكامل في تطبيق القواعد الأمنية."
+            ];
+
+            const annualScenarios = [
+                "حضر شخص بسيارة فارهة على البوابة الرئيسية ورفض إبراز هويته أو تفتيش السيارة بحجة أنه من معارف الإدارة. كيف تتصرف؟",
+                "لاحظت وجود حقيبة متروكة بدون صاحب بالقرب من منطقة الاستقبال منذ أكثر من 15 دقيقة. ما هي خطواتك بالترتيب؟",
+                "نشبت مشادة كلامية بصوت مرتفع بين اثنين من النزلاء في منطقة حمام السباحة. كيف تتدخل لاحتواء الموقف؟",
+                "انقطع التيار الكهربائي فجأة عن الموقع ليلاً وتوقفت الإضاءة الخارجية. ما هو الإجراء الفوري الذي ستتخذه؟",
+                "طلب منك زميلك في الوردية مغادرة نقطته لمدة نصف ساعة لظرف طارئ دون إخطار المشرف. بماذا ترد عليه؟",
+                "لاحظت وجود شخص غريب يتجول بالقرب من الأسوار الخلفية للموقع ويقوم بالتصوير بهاتفه. كيف تتعامل معه؟",
+                "تأخر فرد الوردية التالية عن الحضور في موعد التسليم الساعة 8 مساءً. ما هو التصرف الصحيح؟",
+                "أبلغك أحد النزلاء بفقدان متعلقات شخصية داخل الموقع. ما هي الإجراءات التي تتبعها فوراً؟",
+                "لاحظت تصاعد دخان خفيف من إحدى الغرف الخدمية المغلقة ليلاً. ما هي خطواتك الفورية؟",
+                "حاول أحد الموردين إدخال بضائع خارج أوقات العمل الرسمية بدون تصريح دخول معتمد. كيف تتصرف؟"
+            ];
+
+            const idx = dayOfYear % annualTips.length;
+            document.getElementById("dailyTip").textContent = annualTips[idx];
+            document.getElementById("dailyScenario").textContent = "موقف اليوم: " + annualScenarios[idx];
+        }
+
+        // جلب البيانات من Google Sheets
+        function loadAllDataFromServer() {
+            fetch(GOOGLE_SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.tip && data.tip.trim() !== "") {
+                        document.getElementById("dailyTip").textContent = data.tip;
+                        document.getElementById("adminTipInput").value = data.tip;
+                    }
+                    if (data.scenario && data.scenario.trim() !== "") {
+                        document.getElementById("dailyScenario").textContent = "توجيه طارئ: " + data.scenario;
+                        document.getElementById("adminScenarioInput").value = data.scenario;
+                    }
+                    allStaff = data.staff || [];
+                    allAttendance = data.attendance || [];
+                    allLeaves = data.leaves || [];
+
+                    populateStaffDropdown();
+                    renderAttendanceReport();
+                    renderAdminLeaves();
+                    renderStaffManageList();
+                })
+                .catch(err => console.error("Sync error:", err));
+        }
+
+        // تعبئة قائمة الأفراد حسب الموقع المختار
+        function populateStaffDropdown() {
+            const site = document.getElementById("siteSelect").value;
+            const select = document.getElementById("employeeSelect");
+            select.innerHTML = '<option value="">-- اختر الاسم والكود --</option>';
+
+            const filtered = allStaff.filter(s => s.site === site);
+            filtered.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.code;
+                opt.textContent = `[${s.code}] ${s.name} (${s.role})`;
+                select.appendChild(opt);
+            });
+            onEmployeeChange();
+        }
+
+        // عند اختيار الموظف: التحقق إذا كان مشرفاً لعرض طلبات إجازات موقعه
+        function onEmployeeChange() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => s.code === code);
+            const supBox = document.getElementById("supervisorLeaveBox");
+
+            if (person && person.role === "مشرف") {
+                supBox.style.display = "block";
+                renderSupervisorLeaves(person);
+            } else {
+                supBox.style.display = "none";
+            }
+        }
+
+        // تأكيد قراءة النصيحة
+        function confirmTipRead() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => s.code === code);
+            if (!person) {
+                alert("اختر موقعك واسمك أولاً من القائمة لتأكيد الاطلاع.");
+                return;
+            }
+            const btn = document.getElementById("btnConfirmTip");
+            btn.disabled = true;
+            btn.textContent = "⏳ جاري التسجيل...";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "تأكيد توجيه",
+                    site: person.site,
+                    employee: `[${person.code}] ${person.name}`,
+                    scenario: document.getElementById("dailyTip").textContent,
+                    response: "تم الاطلاع والالتزام"
+                })
+            }).then(() => {
+                btn.textContent = "✅ تم تسجيل التزامك بالتوجيه";
+            });
+        }
+
+        // تسجيل الحضور والانصراف الفعلي
+        function registerAttendance(moveType) {
+            const site = document.getElementById("siteSelect").value;
+            const shift = document.getElementById("shiftSelect").value;
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => s.code === code);
+
+            if (!person) {
+                alert("من فضلك اختر اسمك وكودك من القائمة أولاً.");
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) + " - " + shift;
+
+            const msg = document.getElementById("attendanceMsg");
+            msg.className = "msg-status msg-loading";
+            msg.textContent = `⏳ جاري تسجيل ${moveType} لـ ${person.name}...`;
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "attendance",
+                    dateStr: dateStr,
+                    timeStr: timeStr,
+                    type: moveType,
+                    site: site,
+                    code: person.code,
+                    name: person.name,
+                    role: person.role
+                })
+            }).then(() => {
+                msg.className = "msg-status msg-success";
+                msg.textContent = `✅ تم تسجيل (${moveType}) بنجاح الساعة ${timeStr}`;
+                allAttendance.push({ dateStr, timeStr, type: moveType, site, code: person.code, name: person.name, role: person.role });
+            });
+        }
+
+        // حساب عدد أيام الإجازة الاعتيادية تلقائياً
+        function calculateLeaveDays() {
+            const fromVal = document.getElementById("leaveFromDate").value;
+            const toVal = document.getElementById("leaveToDate").value;
+            const display = document.getElementById("leaveDaysDisplay");
+
+            if (!fromVal || !toVal) {
+                display.textContent = "مدة الإجازة: حدد تاريخ البداية والنهاية";
+                return 0;
+            }
+            const d1 = new Date(fromVal);
+            const d2 = new Date(toVal);
+            const diffTime = d2 - d1;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (diffDays <= 0) {
+                display.textContent = "⚠️ تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية";
+                display.style.color = "#991b1b";
+                return -1;
+            }
+            display.style.color = "#1e40af";
+            display.textContent = `مدة الإجازة الاعتيادية: ${diffDays} ${diffDays === 1 ? 'يوم' : (diffDays === 2 ? 'يومان' : (diffDays <= 10 ? 'أيام' : 'يوماً'))}`;
+            return diffDays;
+        }
+
+        // إرسال طلب إجازة اعتيادية
+        function submitLeaveRequest() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => s.code === code);
+            const fromVal = document.getElementById("leaveFromDate").value;
+            const toVal = document.getElementById("leaveToDate").value;
+            const reason = document.getElementById("leaveReason").value.trim();
+
+            if (!person) { alert("اختر موقعك واسمك من قسم الحضور أعلاه أولاً."); return; }
+            const days = calculateLeaveDays();
+            if (days <= 0) { alert("يرجى تحديد تاريخ بداية ونهاية صحيح للإجازة."); return; }
+            if (!reason) { alert("يرجى كتابة سبب طلب الإجازة."); return; }
+
+            const periodText = `من ${fromVal} إلى ${toVal} (${days} يوم)`;
+            const leaveId = "LV-" + Date.now().toString().slice(-6);
+            const isSup = (person.role === "مشرف");
+
+            const btn = document.getElementById("btnSubmitLeave");
+            const msg = document.getElementById("leaveMsg");
+            btn.disabled = true;
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري إرسال طلب الإجازة الاعتيادية...";
+
+            const payload = {
+                action: "submitLeave",
+                leaveId: leaveId,
+                code: person.code,
+                name: person.name,
+                role: person.role,
+                site: person.site,
+                leaveType: "إجازة اعتيادية",
+                leaveDate: periodText,
+                reason: reason,
+                supStatus: isSup ? "مُحال لمدير الأمن مباشرة" : "قيد مراجعة المشرف",
+                supRejectReason: "-",
+                adminStatus: "بانتظار اعتماد سيادة المقدم"
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                msg.className = "msg-status msg-success";
+                msg.textContent = isSup
+                    ? "✅ تم رفع طلب إجازتك الاعتيادية مباشرة لسيادة المقدم / محمد مسعد."
+                    : "✅ تم إرسال طلب الإجازة الاعتيادية لمشرف الموقع للمراجعة ثم الاعتماد النهائي.";
+                document.getElementById("leaveReason").value = "";
+                btn.disabled = false;
+                allLeaves.unshift(payload);
+            });
+        }
+
+        // عرض طلبات الإجازة للمشرف (مع منعه من الموافقة على إجازته)
+        function renderSupervisorLeaves(supervisor) {
+            const container = document.getElementById("supervisorLeaveList");
+            const siteLeaves = allLeaves.filter(l => l.site === supervisor.site && l.code !== supervisor.code && l.role !== "مشرف");
+
+            if (siteLeaves.length === 0) {
+                container.innerHTML = '<div style="font-size:13px; color:#475569;">لا توجد طلبات إجازة لأفراد موقعك حالياً.</div>';
+                return;
+            }
+
+            container.innerHTML = "";
+            siteLeaves.forEach(l => {
+                const div = document.createElement("div");
+                div.className = "list-item";
+                div.innerHTML = `
+                    <div><strong>[${l.code}] ${l.name}</strong> - <span class="badge badge-wait">${l.supStatus}</span></div>
+                    <div style="margin-top:4px;">📅 الفترة: <strong>${l.leaveDate}</strong></div>
+                    <div>📝 السبب: ${l.reason}</div>
+                    ${l.supStatus === "قيد مراجعة المشرف" ? `
+                        <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="btn btn-green btn-sm" onclick="supervisorDecide('${l.leaveId}', 'موافقة المشرف', '-')">✔️ موافقة مبدئية</button>
+                            <button class="btn btn-red btn-sm" onclick="supervisorReject('${l.leaveId}')">❌ رفض مع توضيح السبب</button>
+                        </div>
+                    ` : (l.supRejectReason !== "-" ? `<div style="color:#991b1b; font-size:12px;">سبب الرفض: ${l.supRejectReason}</div>` : "")}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function supervisorReject(leaveId) {
+            const reason = prompt("يجب كتابة سبب رفض الإجازة لعرضه على سيادة المقدم:");
+            if (!reason || reason.trim() === "") {
+                alert("لا يمكن الرفض بدون كتابة السبب.");
+                return;
+            }
+            supervisorDecide(leaveId, "مرفوض من المشرف", reason.trim());
+        }
+
+        function supervisorDecide(leaveId, status, rejectReason) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "supervisorLeaveDecision",
+                    leaveId: leaveId,
+                    supStatus: status,
+                    supRejectReason: rejectReason
+                })
+            }).then(() => {
+                alert("تم تسجيل قرارك وإرساله لسيادة المقدم.");
+                const item = allLeaves.find(x => x.leaveId === leaveId);
+                if (item) { item.supStatus = status; item.supRejectReason = rejectReason; }
+                onEmployeeChange();
+            });
+        }
+
+        // إرسال إجابة الموقف اليومي
+        function sendScenarioAnswer() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => s.code === code);
+            const response = document.getElementById("scenarioResponse").value.trim();
+
+            if (!person) { alert("اختر موقعك واسمك من قسم الحضور أعلاه أولاً."); return; }
+            if (!response) { alert("اكتب تصرفك في الموقف أولاً."); return; }
+
+            const btn = document.getElementById("btnScenario");
+            const msg = document.getElementById("scenarioMsg");
+            btn.disabled = true;
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري إرسال إجابتك لمدير الأمن...";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "تقييم موقف",
+                    site: person.site,
+                    employee: `[${person.code}] ${person.name}`,
+                    scenario: document.getElementById("dailyScenario").textContent,
+                    response: response
+                })
+            }).then(() => {
+                msg.className = "msg-status msg-success";
+                msg.textContent = "✅ تم إرسال تصرفك لسيادة المقدم بنجاح!";
+                document.getElementById("scenarioResponse").value = "";
+                btn.disabled = false;
+            });
+        }
+
+        // ==========================================
+        // وظائف لوحة تحكم مدير الأمن (ADM-001)
+        // ==========================================
+        let clickCounter = 0;
+        function unlockAdmin() {
+            clickCounter++;
+            if (clickCounter >= 5) {
+                clickCounter = 0;
+                const pin = prompt("أدخل الرقم السري الخاص بسيادة المقدم / محمد مسعد:");
+                if (pin === ADMIN_PIN) {
+                    document.getElementById("staffView").style.display = "none";
+                    document.getElementById("adminView").style.display = "block";
+                    loadAllDataFromServer();
+                } else if (pin !== null) {
+                    alert("الرقم السري غير صحيح.");
+                }
+            }
+        }
+
+        function backToStaffView() {
+            document.getElementById("adminView").style.display = "none";
+            document.getElementById("staffView").style.display = "block";
+            populateStaffDropdown();
+        }
+
+        function switchAdminTab(tabId, btn) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            btn.classList.add("active");
+        }
+
+        // تقرير الحضور والانصراف والغياب التفصيلي
+        function renderAttendanceReport() {
+            const siteFilter = document.getElementById("reportSiteFilter").value;
+            const dateFilter = document.getElementById("reportDateFilter").value;
+            const container = document.getElementById("reportDetailsList");
+
+            const targetStaff = (siteFilter === "الكل") ? allStaff : allStaff.filter(s => s.site === siteFilter);
+            const dayLogs = allAttendance.filter(a => a.dateStr === dateFilter && (siteFilter === "الكل" || a.site === siteFilter));
+
+            let presentCount = 0;
+            let absentCount = 0;
+            container.innerHTML = "";
+
+            targetStaff.forEach(person => {
+                const personLogs = dayLogs.filter(l => l.code === person.code);
+                const checkIn = personLogs.find(l => l.type === "حضور");
+                const checkOut = personLogs.find(l => l.type === "انصراف");
+
+                if (checkIn) presentCount++; else absentCount++;
+
+                const div = document.createElement("div");
+                div.className = "list-item";
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong>[${person.code}] ${person.name}</strong>
+                        <span style="font-size:11px; color:var(--muted);">${person.site} (${person.role})</span>
+                    </div>
+                    <div style="margin-top:5px;">
+                        ${checkIn ? `<span class="badge badge-in">🟢 حضور: ${checkIn.timeStr}</span>` : `<span class="badge badge-abs">🔴 غائب اليوم</span>`}
+                        ${checkOut ? `<span class="badge badge-out" style="margin-right:5px;">🟡 انصراف: ${checkOut.timeStr}</span>` : ""}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById("repTotal").textContent = targetStaff.length;
+            document.getElementById("repPresent").textContent = presentCount;
+            document.getElementById("repAbsent").textContent = absentCount;
+
+            if (targetStaff.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:var(--muted); font-size:13px;">لا يوجد أفراد مسجلون في هذا الموقع بعد.</div>';
+            }
+        }
+
+        // عرض الإجازات للاعتماد النهائي لمدير الأمن
+        function renderAdminLeaves() {
+            const container = document.getElementById("adminLeavesList");
+            if (allLeaves.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:var(--muted); font-size:13px;">لا توجد طلبات إجازة مسجلة.</div>';
+                return;
+            }
+            container.innerHTML = "";
+            allLeaves.forEach(l => {
+                const div = document.createElement("div");
+                div.className = "list-item";
+                div.innerHTML = `
+                    <div><strong>[${l.code}] ${l.name}</strong> (${l.role} - ${l.site})</div>
+                    <div style="margin-top:4px;">📅 الفترة: <strong>${l.leaveDate}</strong></div>
+                    <div>📝 السبب: ${l.reason}</div>
+                    <div style="margin-top:4px;">🛡️ رأي المشرف: <strong>${l.supStatus}</strong> ${l.supRejectReason !== "-" ? `(<span style="color:#991b1b;">السبب: ${l.supRejectReason}</span>)` : ""}</div>
+                    <div>🎖️ قرار سيادة المقدم: <span class="badge badge-wait">${l.adminStatus}</span></div>
+                    <div style="margin-top:8px; display:flex; gap:6px;">
+                        <button class="btn btn-green btn-sm" onclick="adminDecideLeave('${l.leaveId}', 'معتمد من مدير الأمن ✅')">✅ اعتماد نهائي</button>
+                        <button class="btn btn-red btn-sm" onclick="adminDecideLeave('${l.leaveId}', 'مرفوض من مدير الأمن ❌')">❌ رفض نهائي</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function adminDecideLeave(leaveId, decision) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "adminLeaveDecision",
+                    adminKey: ADMIN_SECRET_KEY,
+                    leaveId: leaveId,
+                    adminStatus: decision
+                })
+            }).then(() => {
+                const item = allLeaves.find(x => x.leaveId === leaveId);
+                if (item) item.adminStatus = decision;
+                renderAdminLeaves();
+            });
+        }
+
+        // إضافة فرد أو مشرف وتوليد كود تلقائي
+        function addNewStaff() {
+            const name = document.getElementById("newStaffName").value.trim();
+            const role = document.getElementById("newStaffRole").value;
+            const site = document.getElementById("newStaffSite").value;
+
+            if (!name) { alert("اكتب اسم الفرد أو المشرف أولاً."); return; }
+
+            const prefix = (role === "مشرف") ? "SUP" : "SEC";
+            const sameRoleCount = allStaff.filter(s => s.code.startsWith(prefix)).length + 1;
+            const code = `${prefix}-${String(sameRoleCount).padStart(3, '0')}`;
+
+            const btn = document.getElementById("btnAddStaff");
+            const msg = document.getElementById("addStaffMsg");
+            btn.disabled = true;
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري الإضافة وتوليد الكود...";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "addStaff",
+                    adminKey: ADMIN_SECRET_KEY,
+                    code: code,
+                    name: name,
+                    role: role,
+                    site: site
+                })
+            }).then(() => {
+                allStaff.push({ code, name, role, site });
+                msg.className = "msg-status msg-success";
+                msg.textContent = `✅ تم إضافة [${code}] ${name} بنجاح!`;
+                document.getElementById("newStaffName").value = "";
+                btn.disabled = false;
+                renderStaffManageList();
+                renderAttendanceReport();
+            });
+        }
+
+        // عرض قائمة القوة مع زر الحذف النهائي
+        function renderStaffManageList() {
+            const filter = document.getElementById("manageSiteFilter").value;
+            const container = document.getElementById("staffManageList");
+            const list = (filter === "الكل") ? allStaff : allStaff.filter(s => s.site === filter);
+
+            if (list.length === 0) {
+                container.innerHTML = '<div style="font-size:13px; color:var(--muted);">لا توجد أسماء مسجلة.</div>';
+                return;
+            }
+            container.innerHTML = "";
+            list.forEach(s => {
+                const div = document.createElement("div");
+                div.className = "list-item";
+                div.style.display = "flex";
+                div.style.justifyContent = "space-between";
+                div.style.alignItems = "center";
+                div.innerHTML = `
+                    <div>
+                        <strong>[${s.code}] ${s.name}</strong>
+                        <div style="font-size:11.5px; color:var(--muted);">${s.role} - ${s.site}</div>
+                    </div>
+                    <button class="btn btn-red btn-sm" style="margin:0;" onclick="deleteStaffMember('${s.code}', '${s.name}')">🗑️ حذف</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteStaffMember(code, name) {
+            if (!confirm(`هل أنت متأكد من حذف [${code}] ${name} نهائياً؟`)) return;
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "deleteStaff",
+                    adminKey: ADMIN_SECRET_KEY,
+                    code: code
+                })
+            }).then(() => {
+                allStaff = allStaff.filter(s => s.code !== code);
+                renderStaffManageList();
+                renderAttendanceReport();
+                alert(`تم حذف ${name} بنجاح.`);
+            });
+        }
+
+        // حفظ التوجيهات والمواقف الطارئة
+        function saveEmergencySettings() {
+            const tip = document.getElementById("adminTipInput").value.trim();
+            const scenario = document.getElementById("adminScenarioInput").value.trim();
+            const btn = document.getElementById("btnSaveSettings");
+            const msg = document.getElementById("settingsMsg");
+
+            btn.disabled = true;
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري النشر...";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "updateSettings",
+                    adminKey: ADMIN_SECRET_KEY,
+                    tip: tip,
+                    scenario: scenario
+                })
+            }).then(() => {
+                msg.className = "msg-status msg-success";
+                msg.textContent = "✅ تم نشر التحديث بنجاح!";
+                btn.disabled = false;
+                if (tip) document.getElementById("dailyTip").textContent = tip;
+                if (scenario) document.getElementById("dailyScenario").textContent = "توجيه طارئ: " + scenario;
+            });
+        }
+    </script>
+</body>
+</html>
