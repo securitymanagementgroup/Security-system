@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <title>إدارة أمن المجموعة - المقدم / محمد مسعد</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --gold: #d97706;
+            --bg: #f1f5f9;
+            --card: rgba(255, 255, 255, 0.96);
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 50px; position: relative; min-height: 100vh; }
+        .watermark-container { position: fixed; top: 52%; left: 50%; transform: translate(-50%, -50%); width: 320px; height: 360px; pointer-events: none; z-index: 0; opacity: 0.085; display: flex; align-items: center; justify-content: center; }
+        .header, .container { position: relative; z-index: 1; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #ffffff; padding: 18px 16px 24px; border-bottom-left-radius: 26px; border-bottom-right-radius: 26px; text-align: center; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.18); user-select: none; }
+        .badge-id { display: inline-block; background: rgba(217, 119, 6, 0.25); border: 1px solid rgba(251, 191, 36, 0.45); color: #fcd34d; font-size: 12px; font-weight: 700; padding: 3px 16px; border-radius: 20px; margin-bottom: 6px; cursor: pointer; }
+        .header h1 { font-size: 20px; font-weight: 800; }
+        .header p { font-size: 13px; color: #cbd5e1; margin-top: 2px; }
+        .live-clock { margin-top: 8px; display: inline-block; background: rgba(15, 23, 42, 0.55); padding: 4px 14px; border-radius: 12px; font-size: 12px; color: #93c5fd; font-weight: 700; }
+        .container { max-width: 680px; margin: 0 auto; padding: 0 14px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: -15px; margin-bottom: 16px; }
+        .stats-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; margin-bottom: 14px; }
+        @media (min-width: 520px) { .stats-grid-4 { grid-template-columns: repeat(4, 1fr); } }
+        .stat-card { background: var(--card); padding: 11px 6px; border-radius: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
+        .stat-label { font-size: 11px; color: var(--muted); display: block; font-weight: 600; }
+        .stat-value { font-size: 14px; font-weight: 800; color: var(--primary); }
+        .tip-card { background: linear-gradient(135deg, rgba(255, 251, 235, 0.96) 0%, rgba(254, 243, 199, 0.96) 100%); border: 1px solid #fcd34d; border-right: 5px solid var(--warning); border-radius: 16px; padding: 15px; margin-bottom: 16px; }
+        .tip-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 4px; }
+        .tip-text { font-size: 13.5px; color: #78350f; font-weight: 600; }
+        .section-card { background: var(--card); border-radius: 18px; padding: 18px 15px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04); border: 1px solid var(--border); }
+        .section-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; margin-top: 10px; }
+        select, textarea, input { width: 100%; padding: 11px 12px; font-size: 14px; font-weight: 600; color: var(--text); background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; outline: none; }
+        textarea { resize: vertical; min-height: 80px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .search-row { display: flex; gap: 8px; align-items: center; }
+        .days-badge { margin-top: 8px; padding: 8px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; color: #1e40af; font-size: 13px; font-weight: 700; text-align: center; }
+        .scenario-box { background: #f1f5f9; padding: 12px; border-radius: 12px; border-right: 4px solid var(--primary); margin-bottom: 12px; font-size: 13.5px; font-weight: 700; color: var(--primary); }
+        .btn { width: 100%; margin-top: 12px; padding: 12px; border: none; border-radius: 12px; font-size: 14.5px; font-weight: 700; cursor: pointer; color: #fff; }
+        .btn-blue { background: var(--accent); }
+        .btn-green { background: var(--success); }
+        .btn-amber { background: var(--gold); }
+        .btn-red { background: var(--danger); }
+        .btn-dark { background: var(--primary); }
+        .btn-sm { padding: 7px 12px; font-size: 12.5px; width: auto; margin-top: 6px; }
+        .msg-status { margin-top: 12px; padding: 14px; border-radius: 12px; font-size: 13.5px; font-weight: 700; text-align: center; display: none; line-height: 1.7; }
+        .msg-success { background: #dcfce7; color: #166534; display: block; border: 1px solid #bbf7d0; }
+        .msg-error { background: #fee2e2; color: #991b1b; display: block; border: 1px solid #fca5a5; }
+        .msg-loading { background: #e0f2fe; color: #075985; display: block; }
+        .admin-view { display: none; }
+        .admin-top-bar { display: flex; justify-content: space-between; align-items: center; background: #fee2e2; border: 1.5px solid #fca5a5; padding: 10px 14px; border-radius: 14px; margin-top: -12px; margin-bottom: 14px; }
+        .tabs-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 14px; }
+        @media (min-width: 520px) { .tabs-bar { grid-template-columns: repeat(4, 1fr); } }
+        .tab-btn { padding: 10px 6px; background: #e2e8f0; color: var(--primary); border: none; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .list-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; font-size: 13px; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; margin-left: 4px; margin-top: 4px; }
+        .badge-in { background: #dcfce7; color: #166534; }
+        .badge-out { background: #fef3c7; color: #92400e; }
+        .badge-abs { background: #fee2e2; color: #991b1b; }
+        .time-meta { margin-top: 6px; padding: 8px 10px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 12px; color: #0f172a; }
+        .answer-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px 10px; border-radius: 8px; margin-top: 6px; font-size: 13px; color: #166534; }
+        .sync-badge { display: inline-block; background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 800; margin-bottom: 10px; }
+        table.monthly-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; background: #fff; }
+        table.monthly-table th, table.monthly-table td { border: 1px solid #cbd5e1; padding: 7px 6px; text-align: center; }
+        table.monthly-table th { background: #0f172a; color: #fff; }
+        .table-wrap { overflow-x: auto; margin-top: 10px; }
+        @media print {
+            .header, .admin-top-bar, .tabs-bar, .no-print { display: none !important; }
+            body { background: #fff; padding-bottom: 0; }
+            .section-card { box-shadow: none; border: 1px solid #cbd5e1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark-container" aria-hidden="true">
+        <svg viewBox="0 0 300 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#b45309" />
+                    <stop offset="50%" stop-color="#d97706" />
+                    <stop offset="100%" stop-color="#78350f" />
+                </linearGradient>
+            </defs>
+            <path d="M150 12 L272 56 L272 162 C272 242 218 298 150 328 C82 298 28 242 28 162 L28 56 Z" fill="none" stroke="url(#goldGrad)" stroke-width="10" />
+        </svg>
+    </div>
+
+    <header class="header">
+        <span class="badge-id" onclick="unlockAdmin()">ADM-001</span>
+        <h1>المقدم / محمد مسعد</h1>
+        <p>مدير أمن المجموعة | 5 مواقع | <span id="headerTotalCount">71</span> فرداً</p>
+        <div class="live-clock" id="liveClock">جاري تحميل التاريخ والوقت...</div>
+    </header>
+
+    <main class="container" id="staffView">
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">إجمالي القوة</span>
+                <span class="stat-value" id="totalForceStat">71 فرداً</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">الوردية الحالية</span>
+                <span class="stat-value" id="currentShiftBadge" style="color:#d97706;">☀️ صباحي</span>
+            </div>
+        </section>
+
+        <section class="tip-card">
+            <div class="tip-title">💡 توجيه ونصيحة مدير الأمن اليومية:</div>
+            <div class="tip-text" id="dailyTip">اليقظة الدائمة على البوابات خط الدفاع الأول، ولا تسمح بدخول أي زائر دون إثبات هويته.</div>
+            <button class="btn btn-amber btn-sm" onclick="confirmTipRead()">✔️ تم الاطلاع والالتزام بالتوجيه</button>
+            <div id="tipMsg" class="msg-status" style="margin-top:6px;"></div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="section-title">📋 تسجيل الحضور والانصراف الفعلي</h2>
+            <label>1. اختر الموقع الذي تتواجد به حالياً:</label>
+            <select id="siteSelect">
+                <option value="الهمبرا 1">الهمبرا 1</option>
+                <option value="الهمبرا 2">الهمبرا 2</option>
+                <option value="الهمبرا 3">الهمبرا 3</option>
+                <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+            </select>
+
+            <label>2. اختر الوردية:</label>
+            <select id="shiftSelect">
+                <optgroup label="⏰ نظام ورديتين (كل وردية 12 ساعة)">
+                    <option value="صباحي 12س (8 ص - 8 م)">☀️ وردية صباحي 12 ساعة (من 8 ص إلى 8 م)</option>
+                    <option value="ليلي 12س (8 م - 8 ص)">🌙 وردية ليلي 12 ساعة (من 8 م إلى 8 ص)</option>
+                </optgroup>
+                <optgroup label="⏰ نظام 3 ورديات (كل وردية 8 ساعات)">
+                    <option value="صباحي (8 ص - 4 م)">☀️ وردية صباحي (من 8 صباحاً حتى 4 عصراً)</option>
+                    <option value="مسائي (4 م - 12 ص)">🌅 وردية مسائي (من 4 عصراً حتى 12 منتصف الليل)</option>
+                    <option value="ليلي (12 ص - 8 ص)">🌙 وردية ليلي (من 12 منتصف الليل حتى 8 صباحاً)</option>
+                </optgroup>
+            </select>
+            <div id="scheduledShiftHint" style="margin-top:6px; font-size:12px; color:#1e40af; font-weight:700;"></div>
+
+            <label>3. ابحث بالاسم أو الكود:</label>
+            <input type="text" id="employeeSearchInput" placeholder="اكتب اسم الفرد أو كوده..." oninput="filterEmployeeDatalist()" style="margin-bottom: 8px;">
+
+            <select id="employeeSelect" size="5" style="height: 130px;" onchange="onEmployeeSelected()">
+                <option value="">-- اختر اسمك وكودك ووظيفتك من القائمة --</option>
+            </select>
+
+            <div class="row-2">
+                <button class="btn btn-blue" onclick="registerAttendance('حضور')">🟢 تسجيل حضور</button>
+                <button class="btn btn-amber" onclick="registerAttendance('انصراف')">🔴 تسجيل انصراف</button>
+            </div>
+            <div id="attendanceMsg" class="msg-status"></div>
+        </section>
+
+        <section class="section-card" id="myLeavesSection" style="display:none; background: #eff6ff; border: 1px solid #bfdbfe;">
+            <h2 class="section-title" style="color: #1e40af;">📌 سجل إجازاتك والإجراء المتخذ عليها</h2>
+            <div id="myLeavesList"></div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="section-title">🗓️ تقديم طلب إجازة اعتيادية</h2>
+            <div class="row-2">
+                <div><label>من تاريخ:</label><input type="date" id="leaveFromDate" onchange="calculateLeaveDays()"></div>
+                <div><label>إلى تاريخ:</label><input type="date" id="leaveToDate" onchange="calculateLeaveDays()"></div>
+            </div>
+            <div class="days-badge" id="leaveDaysDisplay">مدة الإجازة: حدد تاريخ البداية والنهاية</div>
+            <label>سبب طلب الإجازة:</label>
+            <textarea id="leaveReason" placeholder="اكتب سبب الإجازة..."></textarea>
+            <button class="btn btn-dark" onclick="submitLeaveRequest()">📩 إرسال طلب الإجازة</button>
+            <div id="leaveMsg" class="msg-status"></div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="section-title">🎯 اختبار المواقف الأمنية</h2>
+            <div class="scenario-box" id="dailyScenario">موقف اليوم: حضر شخص بسيارة فارهة على البوابة الرئيسية ورفض إبراز هويته. كيف تتصرف؟</div>
+            <label>اكتب تصرفك في هذا الموقف:</label>
+            <textarea id="scenarioResponse" placeholder="اكتب رد فعلك..."></textarea>
+            <button class="btn btn-green" onclick="sendScenarioAnswer()">📤 إرسال الإجابة لمدير الأمن</button>
+            <div id="scenarioMsg" class="msg-status"></div>
+        </section>
+    </main>
+
+    <main class="container admin-view" id="adminView">
+        <div class="admin-top-bar">
+            <span style="font-size:13px; font-weight:800; color:#991b1b;">🔐 لوحة تحكم المقدم / محمد مسعد</span>
+            <button class="btn btn-dark btn-sm" style="margin:0;" onclick="backToStaffView()">⬅️ رجوع</button>
+        </div>
+
+        <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchAdminTab('tabReport', this)">📊 الحضور والمتابعة</button>
+            <button class="tab-btn" onclick="switchAdminTab('tabMonthly', this)">📅 السجل الشهري (26-25)</button>
+            <button class="tab-btn" onclick="switchAdminTab('tabLeaves', this)">🗓️ الإجازات وسجلها</button>
+            <button class="tab-btn" onclick="switchAdminTab('tabManage', this)">👥 القوة والتوجيهات</button>
+        </div>
+
+        <div class="tab-content active" id="tabReport">
+            <section class="section-card">
+                <div class="sync-badge">🟢 متصل بقاعدة بيانات جوجل (Google Sheets)</div>
+                <button class="btn btn-dark btn-sm no-print" style="float:left; margin:0;" onclick="refreshFromGoogle(true)">🔄 تحديث البيانات الآن</button>
+                <h2 class="section-title">📊 متابعة الحضور والانصراف والمواعيد اليومية</h2>
+
+                <label class="no-print">🔍 بحث سريع عن فرد في لوحة التحكم (مربوط بقاعدة بيانات الأفراد):</label>
+                <div class="search-row no-print">
+                    <input type="text" id="adminStaffSearchInput" placeholder="ابحث باسم الفرد أو كوده..." oninput="renderAttendanceReport()">
+                    <button class="btn btn-blue btn-sm" style="margin:0;" onclick="renderAttendanceReport()">بحث</button>
+                    <button class="btn btn-dark btn-sm" style="margin:0;" onclick="clearAdminStaffSearch()">مسح</button>
+                </div>
+
+                <div class="row-2 no-print">
+                    <div>
+                        <label>اختر الموقع:</label>
+                        <select id="reportSiteFilter" onchange="renderAttendanceReport()">
+                            <option value="الكل">عرض جميع المواقع (إجمالي عام)</option>
+                            <option value="الهمبرا 1">الهمبرا 1 فقط</option>
+                            <option value="الهمبرا 2">الهمبرا 2 فقط</option>
+                            <option value="الهمبرا 3">الهمبرا 3 فقط</option>
+                            <option value="شلالات الهمبرا">شلالات الهمبرا فقط</option>
+                            <option value="برنسيس ريزورت">برنسيس ريزورت فقط</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>التاريخ:</label>
+                        <input type="date" id="reportDateFilter" onchange="renderAttendanceReport()">
+                    </div>
+                </div>
+
+                <div class="stats-grid-4">
+                    <div class="stat-card">
+                        <span class="stat-label">القوة المختارة</span>
+                        <span class="stat-value" id="repTotal">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">حضروا اليوم</span>
+                        <span class="stat-value" style="color:var(--success);" id="repPresent">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">انصرفوا اليوم</span>
+                        <span class="stat-value" style="color:var(--gold);" id="repCheckout">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">ردوا ع الموقف</span>
+                        <span class="stat-value" style="color:var(--accent);" id="repScenarioCount">0</span>
+                    </div>
+                </div>
+
+                <div id="siteBreakdownSummary" style="margin: 12px 0; background: #eff6ff; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; color: #1e40af; line-height: 1.8;">
+                    📊 تفاصيل المتابعة: جاري الحساب...
+                </div>
+
+                <div id="reportDetailsList" style="margin-top:12px;"></div>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tabMonthly">
+            <section class="section-card">
+                <button class="btn btn-dark btn-sm no-print" style="float:left; margin:0;" onclick="window.print()">🖨️ طباعة السجل الشهري</button>
+                <h2 class="section-title">📅 سجل شهري للحضور والانصراف (من 26 إلى 25)</h2>
+                <div class="row-2 no-print">
+                    <div>
+                        <label>اختر الموظف (من قاعدة البيانات):</label>
+                        <select id="monthlyEmployeeSelect" onchange="renderMonthlyEmployeeReport()">
+                            <option value="">-- اختر الموظف لعرض سجله الشهري --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>اختر الشهر المرجعي (ينتهي يوم 25 فيه):</label>
+                        <input type="month" id="monthlyCyclePicker" onchange="renderMonthlyEmployeeReport()">
+                    </div>
+                </div>
+                <div id="monthlyCycleRangeBadge" class="days-badge">الفترة الزمنية: جاري التحديد...</div>
+                <div id="monthlyEmployeeSummary" style="margin-top:10px; font-size:13px; font-weight:700; color:#0f172a;"></div>
+                <div class="table-wrap" id="monthlyEmployeeTableContainer"></div>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tabLeaves">
+            <section class="section-card">
+                <h2 class="section-title">⏳ طلبات الإجازات قيد الاعتماد</h2>
+                <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">ملاحظة: عند رفض أي إجازة يتم إخفاؤها من هذه القائمة فوراً وتبقى مسجلة في سجل الإجازات أدناه.</p>
+                <div id="adminPendingLeavesList"></div>
+            </section>
+
+            <section class="section-card">
+                <button class="btn btn-dark btn-sm no-print" style="float:left; margin:0;" onclick="window.print()">🖨️ طباعة سجل الإجازات</button>
+                <h2 class="section-title">📚 سجل الإجازات الكامل والإجراء المتخذ</h2>
+                <div id="adminAllLeavesHistoryList"></div>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tabManage">
+            <section class="section-card">
+                <h2 class="section-title">📢 تحديث التوجيهات اليومية وموقف اليوم</h2>
+                <label>توجيه ونصيحة مدير الأمن:</label>
+                <textarea id="adminTipInput" placeholder="اكتب التوجيه الجديد..."></textarea>
+                <label>موقف اليوم الأمني:</label>
+                <textarea id="adminScenarioInput" placeholder="اكتب موقف اليوم..."></textarea>
+                <button class="btn btn-blue" onclick="updateDailyDirectives()">💾 حفظ وتحديث التوجيهات وموقف اليوم</button>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">➕ إضافة فرد أمن أو مشرف جديد</h2>
+                <label>الاسم الكامل:</label>
+                <input type="text" id="newStaffName" placeholder="اسم الفرد...">
+                <div class="row-2">
+                    <div>
+                        <label>الوظيفة:</label>
+                        <select id="newStaffRole">
+                            <option value="مساعد مدير الأمن">مساعد مدير الأمن (AST)</option>
+                            <option value="مشرف أمن">مشرف أمن (SUP)</option>
+                            <option value="مراقب أمن">مراقب أمن (SEC)</option>
+                            <option value="فرد أمن" selected>فرد أمن (SEC)</option>
+                            <option value="خفير">خفير (SEC)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>الموقع:</label>
+                        <select id="newStaffSite">
+                            <option value="">بدون موقع افتراضي</option>
+                            <option value="الهمبرا 1">الهمبرا 1</option>
+                            <option value="الهمبرا 2">الهمبرا 2</option>
+                            <option value="الهمبرا 3">الهمبرا 3</option>
+                            <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                            <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-green" onclick="addNewStaff()">✅ إضافة الفرد للقوة</button>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">🗑️ إدارة القوة المسجلة بالكامل</h2>
+                <label>فلترة عرض القوة حسب الموقع:</label>
+                <select id="manageSiteFilter" onchange="renderStaffManageList()">
+                    <option value="الكل">عرض كل القوة (الجميع)</option>
+                    <option value="الهمبرا 1">الهمبرا 1</option>
+                    <option value="الهمبرا 2">الهمبرا 2</option>
+                    <option value="الهمبرا 3">الهمبرا 3</option>
+                    <option value="شلالات الهمبرا">شلالات الهمبرا</option>
+                    <option value="برنسيس ريزورت">برنسيس ريزورت</option>
+                </select>
+                <div id="staffManageList" style="margin-top:12px; max-height: 400px; overflow-y: auto;"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxKuFsjMSd4iZ_qFQdIE7KZ790m2xweVYEppeCPhJGjBYwGtY48BpNDDdDpFYLM6Ovj/exec";
+
+        const ADMIN_PIN = "2026";
+        const SUPERVISOR_ROLES = ["مشرف عام الكمبوند", "مشرف أمن", "مشرف"];
+        const ASSISTANT_ROLES = ["مساعد مدير الأمن", "سنيور سوبر فايزر أمن"];
+
+        const DEFAULT_STAFF_LIST = [
+            {"code": "AST-001", "name": "أبو المعارف أحمد حسين", "role": "مساعد مدير الأمن", "site": ""},
+            {"code": "AST-002", "name": "مدحت عبد الله عبد الظاهر", "role": "مساعد مدير الأمن", "site": ""},
+            {"code": "AST-003", "name": "محمود أنور محمد", "role": "سنيور سوبر فايزر أمن", "site": ""},
+            {"code": "SUP-001", "name": "أحمد محمود محمد", "role": "مشرف أمن", "site": ""},
+            {"code": "SEC-001", "name": "علي محمد عبد العال", "role": "مراقب أمن", "site": ""},
+            {"code": "SUP-002", "name": "محمد أحمد عبد اللطيف", "role": "مشرف أمن", "site": ""},
+            {"code": "SUP-003", "name": "محمد سعد عطية", "role": "مشرف أمن", "site": ""},
+            {"code": "SUP-004", "name": "سلامة صلاح علي", "role": "مشرف أمن", "site": ""},
+            {"code": "SUP-005", "name": "محمود محمد إبراهيم", "role": "مشرف أمن", "site": ""},
+            {"code": "SUP-006", "name": "خالد أبو النجا عبد المحسن", "role": "مشرف أمن", "site": ""},
+            {"code": "AST-004", "name": "حاتم السيد سباق", "role": "مشرف عام الكمبوند", "site": ""},
+            {"code": "SUP-007", "name": "محمد حسن عبد المنعم", "role": "مشرف أمن", "site": ""},
+            {"code": "SEC-002", "name": "محمد محروس عبد العظيم", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-003", "name": "رجب علي أحمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-004", "name": "رمضان عبد الله محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-005", "name": "محمد ربيع عبد اللاه", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-006", "name": "محمود الدكروني محمود", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-007", "name": "بلتاجي سليمان محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-008", "name": "أحمد محمد محمد مفرج", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-009", "name": "نصر عبد الناجي محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-010", "name": "خلف الله عبد العزيز محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-011", "name": "مؤمن حسن أحمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-012", "name": "أحمد علي أحمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-013", "name": "أحمد عبد الدايم حسين", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-014", "name": "حساني عبد الحكيم جاد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-015", "name": "أحمد عدلي صبره", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-016", "name": "عمرو علي أحمد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-017", "name": "محمد خلف الله عبد العزيز", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-018", "name": "عامر عبد ربه محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-019", "name": "إبراهيم عبد العزيز محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-020", "name": "محمد رشدي عبد الغني", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-021", "name": "محمد هلالي علي", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-022", "name": "عاطف نور الدين محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-023", "name": "محمد عطيتو محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-024", "name": "محمود أبو السعود محمود", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-025", "name": "محمد فاوي", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-026", "name": "محمود عصام محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-027", "name": "ممدوح أحمد محمود", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-028", "name": "علي جاد الرب علي", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-029", "name": "محمد صلاح أحمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-030", "name": "عبد الرحيم صابر حسن", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-031", "name": "مجدي محمد الصغير", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-032", "name": "فراج محمد إبراهيم", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-033", "name": "محمد أحمد إبراهيم", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-034", "name": "محمود محمد عطيت الله", "role": "خفير", "site": ""},
+            {"code": "SEC-035", "name": "محمد ضاحي محمد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-036", "name": "محسوب إبراهيم أحمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-037", "name": "محمد بهاء الدين محمد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-038", "name": "حسين سعيد سيد", "role": "فرد أمن", "site": ""},
+            {"code": "SEC-039", "name": "حسن عبد النعيم رزق", "role": "خفير", "site": ""},
+            {"code": "SEC-040", "name": "أحمد عبد الله فوزي", "role": "خفير", "site": ""},
+            {"code": "SEC-041", "name": "يس أحمد إبراهيم", "role": "خفير", "site": ""},
+            {"code": "SEC-042", "name": "محمد عبد الجواد عبد الرازق", "role": "خفير", "site": ""},
+            {"code": "SEC-043", "name": "محمد رشاد عمران", "role": "خفير", "site": ""},
+            {"code": "SEC-044", "name": "صلاح خليل محمد", "role": "خفير", "site": ""},
+            {"code": "SEC-045", "name": "أحمد فهمي حامد", "role": "خفير", "site": ""},
+            {"code": "SEC-046", "name": "علاء رشاد محمد", "role": "خفير", "site": ""},
+            {"code": "AST-005", "name": "حسام فكري عبد اللطيف", "role": "مشرف عام الكمبوند", "site": ""},
+            {"code": "SUP-008", "name": "أحمد محمود أحمد", "role": "مشرف أمن", "site": ""},
+            {"code": "SEC-047", "name": "إسماعيل محمود عبد العزيز", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-048", "name": "حمادة عبد الرحيم عمار", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-049", "name": "مصطفى أحمد إبراهيم", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-050", "name": "فوزي أحمد محمود", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-051", "name": "سيد الطيري سليمان", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-052", "name": "محمود الموجي خلف", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-053", "name": "عمرو سعد عبد المجيد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-054", "name": "أحمد عبد المحسن أحمد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-055", "name": "سمير صبري عبد الصبور", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-056", "name": "أحمد عادل محمد", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-057", "name": "محمد صفوت دردير", "role": "مراقب أمن", "site": ""},
+            {"code": "SEC-058", "name": "سالم عبادي محمد", "role": "خفير", "site": ""}
+        ];
+
+        let allStaff = [...DEFAULT_STAFF_LIST];
+        let allAttendance = [];
+        let allLeaves = [];
+        let allTipConfirms = [];
+        let allScenarios = [];
+        let serverTimeOffsetMs = 0;
+
+        function sanitizeStaffSite(siteVal) {
+            const clean = String(siteVal || "").trim();
+            return clean === "الهمبرا 1" ? "" : clean;
+        }
+
+        function getLocalDateStr(d = new Date()) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getAppNow() {
+            return new Date(Date.now() + serverTimeOffsetMs);
+        }
+
+        function getScheduledShiftByAppHour(hour) {
+            return (hour >= 8 && hour < 20)
+                ? "صباحي 12س (8 ص - 8 م)"
+                : "ليلي 12س (8 م - 8 ص)";
+        }
+
+        function isTimeWithinShiftWindow(shiftStr, hour) {
+            const s = String(shiftStr || "");
+            if (s.includes("صباحي (8 ص - 4 م)")) return hour >= 8 && hour < 16;
+            if (s.includes("مسائي (4 م - 12 ص)")) return hour >= 16 && hour < 24;
+            if (s.includes("ليلي (12 ص - 8 ص)")) return hour >= 0 && hour < 8;
+            if (s.includes("صباحي 12س")) return hour >= 8 && hour < 20;
+            if (s.includes("ليلي 12س")) return hour >= 20 || hour < 8;
+            return false;
+        }
+
+        function generateNextStaffCode(prefix, staffList) {
+            let maxNum = 0;
+            const escapedPrefix = prefix.replace("-", "\\-");
+            const regex = new RegExp("^" + escapedPrefix + "(\\d+)$", "i");
+            staffList.forEach(s => {
+                const match = String(s.code || "").trim().match(regex);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+            });
+            return prefix + String(maxNum + 1).padStart(3, "0");
+        }
+
+        function updateClockAndShift() {
+            const now = getAppNow();
+            const dateStr = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const clockEl = document.getElementById("liveClock");
+            if (clockEl) clockEl.textContent = `📅 ${dateStr} | ⏰ ${timeStr}`;
+
+            const hour = now.getHours();
+            const badge = document.getElementById("currentShiftBadge");
+            if (badge) {
+                if (hour >= 8 && hour < 20) {
+                    badge.textContent = "☀️ صباحي 12س (8ص-8م)";
+                    badge.style.color = "#d97706";
+                } else {
+                    badge.textContent = "🌙 ليلي 12س (8م-8ص)";
+                    badge.style.color = "#1e40af";
+                }
+            }
+
+            const hintEl = document.getElementById("scheduledShiftHint");
+            if (hintEl) {
+                hintEl.textContent = `🕒 الوردية المقررة الآن حسب توقيت التطبيق: ${getScheduledShiftByAppHour(hour)}`;
+            }
+        }
+        setInterval(updateClockAndShift, 1000);
+        updateClockAndShift();
+
+        async function postToGoogle(bodyObj) {
+            if (!API_URL || API_URL.includes("ضع_هنا_رابط")) {
+                throw new Error("Missing API_URL");
+            }
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(bodyObj)
+            });
+            return await res.json();
+        }
+
+        function mergeByKey(existingArr, incomingArr, keyName) {
+            const map = new Map();
+            existingArr.forEach(item => {
+                if (item && item[keyName]) map.set(String(item[keyName]), item);
+            });
+            incomingArr.forEach(item => {
+                if (item && item[keyName]) {
+                    const prev = map.get(String(item[keyName]));
+                    if (!prev || Number(item.updatedAt || item.createdAt || 0) >= Number(prev.updatedAt || prev.createdAt || 0)) {
+                        map.set(String(item[keyName]), item);
+                    }
+                }
+            });
+            return Array.from(map.values());
+        }
+
+        async function refreshFromGoogle(showToast = false) {
+            if (!API_URL || API_URL.includes("ضع_هنا_رابط")) return;
+            try {
+                const res = await fetch(`${API_URL}?action=getAll&t=${Date.now()}`);
+                const data = await res.json();
+
+                if (data.serverTime && typeof data.serverTime.serverNowMs === "number") {
+                    serverTimeOffsetMs = data.serverTime.serverNowMs - Date.now();
+                    updateClockAndShift();
+                }
+
+                if (Array.isArray(data.staff) && data.staff.length > 0) {
+                    allStaff = data.staff.map(s => ({ ...s, site: sanitizeStaffSite(s.site) }));
+                } else {
+                    allStaff = [...DEFAULT_STAFF_LIST];
+                    for (const member of DEFAULT_STAFF_LIST) {
+                        postToGoogle({ action: "upsertStaff", record: member }).catch(() => {});
+                    }
+                }
+
+                if (Array.isArray(data.attendance)) allAttendance = mergeByKey(allAttendance, data.attendance, "id");
+                if (Array.isArray(data.leaves)) allLeaves = mergeByKey(allLeaves, data.leaves, "leaveId");
+                if (Array.isArray(data.tipConfirms)) allTipConfirms = mergeByKey(allTipConfirms, data.tipConfirms, "id");
+                if (Array.isArray(data.scenarios)) allScenarios = mergeByKey(allScenarios, data.scenarios, "id");
+
+                if (Array.isArray(data.settings) && data.settings.length > 0) {
+                    const daily = data.settings.find(s => s.key === "daily") || data.settings[0];
+                    if (daily.tip) {
+                        document.getElementById("dailyTip").textContent = daily.tip;
+                        document.getElementById("adminTipInput").value = daily.tip;
+                    }
+                    if (daily.scenario) {
+                        document.getElementById("dailyScenario").textContent = "موقف اليوم: " + daily.scenario;
+                        document.getElementById("adminScenarioInput").value = daily.scenario;
+                    }
+                }
+
+                document.getElementById("totalForceStat").textContent = allStaff.length + " فرداً";
+                document.getElementById("headerTotalCount").textContent = allStaff.length;
+                populateStaffDropdown(allStaff);
+                populateMonthlyStaffDropdown(allStaff);
+                renderAttendanceReport();
+                renderMonthlyEmployeeReport();
+                renderAdminLeavesList();
+                renderStaffManageList();
+                window.onEmployeeSelected();
+
+                if (showToast) alert("✅ تم تحديث البيانات من Google Sheets بنجاح.");
+            } catch (err) {
+                if (showToast) alert("⚠️ تعذر التحديث من رابط جوجل، تحقق من إعدادات النشر.");
+            }
+        }
+
+        function initApp() {
+            const now = getAppNow();
+            const hour = now.getHours();
+            const shiftSelect = document.getElementById("shiftSelect");
+            if (shiftSelect) {
+                if (hour >= 8 && hour < 20) shiftSelect.value = "صباحي 12س (8 ص - 8 م)";
+                else shiftSelect.value = "ليلي 12س (8 م - 8 ص)";
+            }
+            const repDate = document.getElementById("reportDateFilter");
+            if (repDate) repDate.value = getLocalDateStr(now);
+
+            const mPicker = document.getElementById("monthlyCyclePicker");
+            if (mPicker) {
+                let targetYear = now.getFullYear();
+                let targetMonth = now.getMonth() + 1;
+                if (now.getDate() > 25) {
+                    targetMonth += 1;
+                    if (targetMonth > 12) { targetMonth = 1; targetYear += 1; }
+                }
+                mPicker.value = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
+            }
+
+            populateStaffDropdown(allStaff);
+            populateMonthlyStaffDropdown(allStaff);
+            refreshFromGoogle(false);
+            setInterval(() => refreshFromGoogle(false), 15000);
+        }
+        initApp();
+
+        function populateStaffDropdown(staffArray) {
+            const select = document.getElementById("employeeSelect");
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- اختر اسمك وكودك ووظيفتك --</option>';
+            staffArray.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.code;
+                opt.textContent = `[${s.code}] ${s.name} — (${s.role})`;
+                select.appendChild(opt);
+            });
+            if (currentVal) select.value = currentVal;
+        }
+
+        function populateMonthlyStaffDropdown(staffArray) {
+            const select = document.getElementById("monthlyEmployeeSelect");
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- اختر الموظف لعرض سجله الشهري --</option>';
+            staffArray.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.code;
+                const cleanSite = sanitizeStaffSite(s.site);
+                opt.textContent = cleanSite ? `[${s.code}] ${s.name} — (${cleanSite})` : `[${s.code}] ${s.name}`;
+                select.appendChild(opt);
+            });
+            if (currentVal) select.value = currentVal;
+        }
+
+        window.filterEmployeeDatalist = function() {
+            const query = document.getElementById("employeeSearchInput").value.trim().toLowerCase();
+            if (!query) { populateStaffDropdown(allStaff); return; }
+            const filtered = allStaff.filter(s => s.name.toLowerCase().includes(query) || s.code.toLowerCase().includes(query));
+            populateStaffDropdown(filtered);
+        };
+
+        window.clearAdminStaffSearch = function() {
+            const input = document.getElementById("adminStaffSearchInput");
+            if (input) {
+                input.value = "";
+                renderAttendanceReport();
+            }
+        };
+
+        window.onEmployeeSelected = function() {
+            const code = document.getElementById("employeeSelect").value;
+            const section = document.getElementById("myLeavesSection");
+            const container = document.getElementById("myLeavesList");
+            if (!code) { section.style.display = "none"; return; }
+            section.style.display = "block";
+            const myLeaves = allLeaves.filter(l => String(l.code) === String(code)).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+
+            if (myLeaves.length === 0) {
+                container.innerHTML = '<div style="font-size:13px; color:var(--muted); text-align:center; padding:6px;">ليس لديك طلبات إجازات مسجلة حالياً.</div>';
+                return;
+            }
+
+            let html = "";
+            myLeaves.forEach(l => {
+                let badgeStyle = "background:#fef3c7; color:#92400e;";
+                if (l.adminStatus === "معتمد") badgeStyle = "background:#dcfce7; color:#166534;";
+                else if (l.adminStatus === "مرفوض") badgeStyle = "background:#fee2e2; color:#991b1b;";
+
+                html += `
+                    <div style="background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:10px; margin-bottom:8px; font-size:12.5px;">
+                        📅 <strong>الفترة:</strong> ${l.leaveDate}<br>
+                        📝 <strong>السبب:</strong> ${l.reason}<br>
+                        📌 <strong>الموقع:</strong> ${l.site}<br>
+                        <div style="margin-top:6px;">
+                            الإجراء المتخذ: <span style="padding:2px 8px; border-radius:6px; font-weight:700; ${badgeStyle}">${l.adminStatus}</span>
+                        </div>
+                        ${l.adminNote ? `<div style="margin-top:4px; color:#334155;">💬 <strong>ملاحظة الإدارة:</strong> ${l.adminNote}</div>` : ``}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        };
+
+        window.confirmTipRead = async function() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => String(s.code) === String(code));
+            if (!person) { alert("من فضلك اختر اسمك من قائمة الحضور والانصراف بالأعلى أولاً لتأكيد قراءة التوجيه."); return; }
+
+            const selectedSite = document.getElementById("siteSelect").value;
+            const now = getAppNow();
+            const dateStr = getLocalDateStr(now);
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            const msg = document.getElementById("tipMsg");
+
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري حفظ وتثبيت قراءة التوجيه...";
+
+            const record = {
+                id: `${dateStr}_${person.code}`,
+                dateStr, timeStr, code: person.code, name: person.name, role: person.role, site: selectedSite, updatedAt: now.getTime()
+            };
+            allTipConfirms = mergeByKey(allTipConfirms, [record], "id");
+            renderAttendanceReport();
+
+            try {
+                await postToGoogle({ action: "upsertTipConfirm", record });
+                msg.className = "msg-status msg-success";
+                msg.innerHTML = `✅ شكراً لك يا <strong>${person.name}</strong>! تم تسجيل اطلاعك والتزامك بالتوجيه اليومي بنجاح.`;
+            } catch (e) {
+                msg.className = "msg-status msg-error";
+                msg.textContent = "❌ تعذر الإرسال لرابط جوجل، تأكد من رابط API_URL.";
+            }
+        };
+
+        window.registerAttendance = async function(moveType) {
+            const selectedSite = document.getElementById("siteSelect").value;
+            const chosenShift = document.getElementById("shiftSelect").value;
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => String(s.code) === String(code));
+            if (!person) { alert("اختر اسمك من القائمة أولاً."); return; }
+
+            const appNow = getAppNow();
+            const appHour = appNow.getHours();
+            const dateStr = getLocalDateStr(appNow);
+            const msg = document.getElementById("attendanceMsg");
+
+            if (moveType === "حضور" && !isTimeWithinShiftWindow(chosenShift, appHour)) {
+                msg.className = "msg-status msg-error";
+                msg.innerHTML = `❌ عذراً يا <strong>${person.name}</strong>!<br>ممنوع تسجيل الحضور في وردية <strong>(${chosenShift})</strong> لأن توقيت التطبيق الفعلي خارج النطاق الزمني المحدد لهذه الوردية.`;
+                return;
+            }
+
+            const existingCheckIn = allAttendance.find(a => String(a.code) === String(person.code) && a.dateStr === dateStr && a.type === "حضور");
+            if (moveType === "انصراف" && !existingCheckIn) {
+                msg.className = "msg-status msg-error";
+                msg.innerHTML = `❌ عذراً يا <strong>${person.name}</strong>!<br>لا يمكن تسجيل الانصراف اليوم (${dateStr}) قبل تسجيل الحضور أولاً وفق توقيت التطبيق.`;
+                return;
+            }
+
+            const clockOnly = appNow.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            const timeStr = `${clockOnly} - ${chosenShift}`;
+
+            msg.className = "msg-status msg-loading";
+            msg.textContent = `⏳ جاري تثبيت وحفظ ${moveType} وفق توقيت التطبيق في (${selectedSite})...`;
+
+            const record = {
+                id: `${dateStr}_${person.code}_${moveType}`,
+                dateStr, timeStr, clockOnly, shift: chosenShift,
+                type: moveType, site: selectedSite, code: person.code, name: person.name, role: person.role,
+                updatedAt: appNow.getTime()
+            };
+
+            try {
+                const resp = await postToGoogle({ action: "upsertAttendance", record });
+                if (resp && resp.ok === false) {
+                    msg.className = "msg-status msg-error";
+                    msg.innerHTML = `❌ عذراً يا <strong>${person.name}</strong>!<br>${resp.message || "تعذر تسجيل الحركة وفق توقيت التطبيق."}`;
+                    return;
+                }
+
+                const finalRecord = (resp && resp.record) ? resp.record : record;
+                allAttendance = mergeByKey(allAttendance, [finalRecord], "id");
+                renderAttendanceReport();
+                renderMonthlyEmployeeReport();
+
+                msg.className = "msg-status msg-success";
+                if (moveType === "حضور") {
+                    msg.innerHTML = `🌟 أهلاً بك يا بطل! <strong>${person.name}</strong><br>تم تسجيل حضورك وفق توقيت التطبيق في <strong>${selectedSite}</strong> (${finalRecord.shift}) الساعة <strong>${finalRecord.clockOnly}</strong> 🛡️`;
+                } else {
+                    msg.innerHTML = `👏 كفيت ووفيت يا بطل! <strong>${person.name}</strong><br>تم تسجيل انصرافك وفق توقيت التطبيق من <strong>${selectedSite}</strong> (${finalRecord.shift}) الساعة <strong>${finalRecord.clockOnly}</strong> 🏠`;
+                }
+            } catch (e) {
+                msg.className = "msg-status msg-error";
+                msg.textContent = "❌ تعذر الحفظ في جوجل، تأكد من رابط API_URL.";
+            }
+        };
+
+        window.calculateLeaveDays = function() {
+            const from = document.getElementById("leaveFromDate").value;
+            const to = document.getElementById("leaveToDate").value;
+            const display = document.getElementById("leaveDaysDisplay");
+            if (from && to) {
+                const diffDays = Math.round((new Date(to) - new Date(from)) / (1000 * 60 * 60 * 24)) + 1;
+                if (diffDays > 0) display.textContent = `📅 مدة الإجازة المطلوبة: ${diffDays} يوم (من ${from} إلى ${to})`;
+                else display.textContent = `⚠️ تاريخ النهاية يجب أن يكون بعد أو يوافق تاريخ البداية`;
+            }
+        };
+
+        window.submitLeaveRequest = async function() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => String(s.code) === String(code));
+            if (!person) { alert("من فضلك اختر اسمك من قائمة الحضور والانصراف بالأعلى أولاً لتقديم الإجازة."); return; }
+
+            const selectedSite = document.getElementById("siteSelect").value;
+            const from = document.getElementById("leaveFromDate").value;
+            const to = document.getElementById("leaveToDate").value;
+            const reason = document.getElementById("leaveReason").value.trim();
+            const msg = document.getElementById("leaveMsg");
+
+            if (!from || !to || !reason) { alert("برجاء تحديد تاريخ البداية والنهاية وكتابة سبب الإجازة."); return; }
+
+            const now = getAppNow();
+            const leaveId = `L-${person.code}-${now.getTime()}`;
+            const leaveDateStr = `من ${from} إلى ${to}`;
+
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري حفظ وتثبيت طلب الإجازة...";
+
+            const record = {
+                leaveId, code: person.code, name: person.name, role: person.role, site: selectedSite,
+                leaveType: "اعتيادي", leaveDate: leaveDateStr, reason,
+                submittedAt: getLocalDateStr(now), createdAt: now.getTime(), adminStatus: "قيد المراجعة", decisionAt: "", adminNote: ""
+            };
+            allLeaves = mergeByKey(allLeaves, [record], "leaveId");
+            renderAdminLeavesList();
+            window.onEmployeeSelected();
+
+            try {
+                await postToGoogle({ action: "upsertLeave", record });
+                msg.className = "msg-status msg-success";
+                msg.innerHTML = `✅ تم حفظ وتثبيت طلب إجازتك بنجاح يا <strong>${person.name}</strong> وسيظهر لسيادة مدير الأمن فوراً.`;
+                document.getElementById("leaveReason").value = "";
+            } catch (e) {
+                msg.className = "msg-status msg-error";
+                msg.textContent = "❌ تعذر إرسال الإجازة، تحقق من الاتصال بـ Google Apps Script.";
+            }
+        };
+
+        window.sendScenarioAnswer = async function() {
+            const code = document.getElementById("employeeSelect").value;
+            const person = allStaff.find(s => String(s.code) === String(code));
+            if (!person) { alert("من فضلك اختر اسمك من قائمة الحضور والانصراف بالأعلى أولاً."); return; }
+
+            const selectedSite = document.getElementById("siteSelect").value;
+            const responseText = document.getElementById("scenarioResponse").value.trim();
+            const msg = document.getElementById("scenarioMsg");
+
+            if (!responseText) { alert("برجاء كتابة تصرفك ورد فعلك في الموقف أولاً."); return; }
+
+            const now = getAppNow();
+            const dateStr = getLocalDateStr(now);
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            msg.className = "msg-status msg-loading";
+            msg.textContent = "⏳ جاري حفظ وتثبيت إجابة الموقف الأمني...";
+
+            const record = {
+                id: `${dateStr}_${person.code}`,
+                dateStr, timeStr, code: person.code, name: person.name, role: person.role,
+                site: selectedSite, response: responseText, updatedAt: now.getTime()
+            };
+            allScenarios = mergeByKey(allScenarios, [record], "id");
+            renderAttendanceReport();
+
+            try {
+                await postToGoogle({ action: "upsertScenario", record });
+                msg.className = "msg-status msg-success";
+                msg.innerHTML = `🎯 بارك الله فيك يا <strong>${person.name}</strong>! تم حفظ وتثبيت إجابتك وإرسالها بنجاح.`;
+                document.getElementById("scenarioResponse").value = "";
+            } catch (e) {
+                msg.className = "msg-status msg-error";
+                msg.textContent = "❌ تعذر حفظ الإجابة.";
+            }
+        };
+
+        window.renderAttendanceReport = function() {
+            const siteFilter = document.getElementById("reportSiteFilter").value;
+            const dateFilter = document.getElementById("reportDateFilter").value;
+            const searchQuery = (document.getElementById("adminStaffSearchInput")?.value || "").trim().toLowerCase();
+            const container = document.getElementById("reportDetailsList");
+            const summaryBox = document.getElementById("siteBreakdownSummary");
+
+            const dayLogs = allAttendance.filter(a => a.dateStr === dateFilter);
+            const dayTips = allTipConfirms.filter(t => t.dateStr === dateFilter);
+            const dayScenarios = allScenarios.filter(s => s.dateStr === dateFilter);
+
+            const sitesList = ["الهمبرا 1", "الهمبرا 2", "الهمبرا 3", "شلالات الهمبرا", "برنسيس ريزورت"];
+            let summaryHTML = "<strong>📊 ملخص المتابعة اليومية لكل موقع على حدة:</strong><br>";
+            sitesList.forEach(sName => {
+                const presentSite = dayLogs.filter(l => l.site === sName && l.type === "حضور").length;
+                const checkoutSite = dayLogs.filter(l => l.site === sName && l.type === "انصراف").length;
+                const tipSite = dayTips.filter(t => t.site === sName).length;
+                const sceSite = dayScenarios.filter(s => s.site === sName).length;
+                summaryHTML += `• <strong>${sName}:</strong> 🟢 حضور: ${presentSite} | 🔴 انصراف: ${checkoutSite} | 💡 توجيه: ${tipSite} | 🎯 موقف: ${sceSite}<br>`;
+            });
+            summaryBox.innerHTML = summaryHTML;
+
+            let targetStaff = siteFilter === "الكل" ? [...allStaff] : allStaff.filter(s => sanitizeStaffSite(s.site) === siteFilter);
+            if (searchQuery) {
+                targetStaff = targetStaff.filter(s => String(s.name).toLowerCase().includes(searchQuery) || String(s.code).toLowerCase().includes(searchQuery));
+            }
+
+            let presentCount = 0;
+            let checkoutCount = 0;
+            let scenarioCount = 0;
+            const stillOnDutyNames = [];
+            let cardsHtml = "";
+
+            targetStaff.forEach(person => {
+                const checkIn = dayLogs.find(l => String(l.code) === String(person.code) && l.type === "حضور");
+                const checkOut = dayLogs.find(l => String(l.code) === String(person.code) && l.type === "انصراف");
+                const tipRead = dayTips.find(t => String(t.code) === String(person.code));
+                const sceAnswer = dayScenarios.find(s => String(s.code) === String(person.code));
+
+                if (checkIn) presentCount++;
+                if (checkOut) checkoutCount++;
+                if (sceAnswer) scenarioCount++;
+
+                if (checkIn && !checkOut) {
+                    stillOnDutyNames.push(`${person.name} (${checkIn.site})`);
+                }
+
+                const cleanPersonSite = sanitizeStaffSite(person.site);
+                const activeSite = checkIn ? checkIn.site : (checkOut ? checkOut.site : (cleanPersonSite || "غير محدد بعد"));
+                const checkoutBadge = checkOut
+                    ? `<span class="badge badge-out">🟠 انصرف (${checkOut.site})</span>`
+                    : (checkIn ? `<span class="badge badge-abs">⏳ حضر ولم ينصرف</span>` : `<span class="badge badge-abs">⏳ لم ينصرف</span>`);
+
+                cardsHtml += `
+                    <div class="list-item">
+                        <div><strong>[${person.code}] ${person.name}</strong> (${person.role}) — 📌 الموقع: <strong>${activeSite}</strong>
+                            <div style="margin-top: 5px; font-size: 11.5px;">
+                                ${checkIn ? `<span class="badge badge-in">🟢 حضر (${checkIn.site})</span>` : `<span class="badge badge-abs">🔴 لم يحضر</span>`}
+                                ${checkoutBadge}
+                                ${tipRead ? `<span class="badge badge-in">💡 قرأ التوجيه</span>` : `<span class="badge badge-abs">⏳ لم يؤكد التوجيه</span>`}
+                                ${sceAnswer ? `<span class="badge badge-in">🎯 رد ع الموقف</span>` : `<span class="badge badge-abs">❌ لم يرد ع الموقف</span>`}
+                            </div>
+                            <div class="time-meta">
+                                🕒 <strong>ميعاد الحضور:</strong> ${checkIn ? checkIn.timeStr : "لم يُسجل بعد"} &nbsp;|&nbsp;
+                                🕔 <strong>ميعاد الانصراف:</strong> ${checkOut ? checkOut.timeStr : "لم يُسجل بعد"}
+                            </div>
+                            ${sceAnswer ? `<div class="answer-box">💬 <strong>رد الفرد على الموقف (${sceAnswer.site} - ${sceAnswer.timeStr || ""}):</strong> ${sceAnswer.response}</div>` : ``}
+                        </div>
+                    </div>
+                `;
+            });
+
+            const dutyAlertHtml = stillOnDutyNames.length > 0
+                ? `<div class="list-item" style="background:#fffbeb; border-color:#fcd34d; color:#92400e;"><strong>⏳ حضروا ولم ينصرفوا بعد (${stillOnDutyNames.length}):</strong> ${stillOnDutyNames.join(" — ")}</div>`
+                : ``;
+
+            container.innerHTML = dutyAlertHtml + (cardsHtml || '<div class="list-item" style="text-align:center; color:var(--muted);">لا توجد نتائج مطابقة للبحث أو التصفية.</div>');
+            document.getElementById("repTotal").textContent = targetStaff.length;
+            document.getElementById("repPresent").textContent = presentCount;
+            document.getElementById("repCheckout").textContent = checkoutCount;
+            document.getElementById("repScenarioCount").textContent = scenarioCount;
+        };
+
+        window.renderMonthlyEmployeeReport = function() {
+            const empCode = document.getElementById("monthlyEmployeeSelect")?.value;
+            const monthVal = document.getElementById("monthlyCyclePicker")?.value;
+            const badge = document.getElementById("monthlyCycleRangeBadge");
+            const summaryEl = document.getElementById("monthlyEmployeeSummary");
+            const tableWrap = document.getElementById("monthlyEmployeeTableContainer");
+
+            if (!monthVal) return;
+            const [yStr, mStr] = monthVal.split("-");
+            const year = parseInt(yStr, 10);
+            const monthIndex = parseInt(mStr, 10) - 1;
+
+            const startDate = new Date(year, monthIndex - 1, 26);
+            const endDate = new Date(year, monthIndex, 25);
+
+            const startStr = getLocalDateStr(startDate);
+            const endStr = getLocalDateStr(endDate);
+            if (badge) badge.textContent = `الفترة الشهرية: من ${startStr} (يوم 26) إلى ${endStr} (يوم 25)`;
+
+            if (!empCode) {
+                if (summaryEl) summaryEl.innerHTML = "";
+                if (tableWrap) tableWrap.innerHTML = '<div class="list-item" style="text-align:center; color:var(--muted);">اختر موظفاً من القائمة لعرض سجل أيامه من 26 إلى 25.</div>';
+                return;
+            }
+
+            const person = allStaff.find(s => String(s.code) === String(empCode));
+            const empLogs = allAttendance.filter(a => String(a.code) === String(empCode) && a.dateStr >= startStr && a.dateStr <= endStr);
+
+            let daysPresent = 0;
+            let daysCheckout = 0;
+            let rowsHtml = "";
+
+            const cursor = new Date(startDate.getTime());
+            while (cursor <= endDate) {
+                const dStr = getLocalDateStr(cursor);
+                const dayName = cursor.toLocaleDateString('ar-EG', { weekday: 'short' });
+                const inRec = empLogs.find(l => l.dateStr === dStr && l.type === "حضور");
+                const outRec = empLogs.find(l => l.dateStr === dStr && l.type === "انصراف");
+
+                if (inRec) daysPresent++;
+                if (outRec) daysCheckout++;
+
+                const cleanSite = person ? sanitizeStaffSite(person.site) : "";
+                rowsHtml += `
+                    <tr>
+                        <td>${dStr} (${dayName})</td>
+                        <td>${inRec ? `<span class="badge badge-in">🟢 ${inRec.clockOnly || inRec.timeStr}</span>` : `<span class="badge badge-abs">غائب / لم يسجل</span>`}</td>
+                        <td>${outRec ? `<span class="badge badge-out">🔴 ${outRec.clockOnly || outRec.timeStr}</span>` : `—`}</td>
+                        <td>${inRec ? inRec.site : (outRec ? outRec.site : (cleanSite || "—"))}</td>
+                    </tr>
+                `;
+                cursor.setDate(cursor.getDate() + 1);
+            }
+
+            const totalCycleDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            if (summaryEl && person) {
+                summaryEl.innerHTML = `👤 الموظف: <strong>[${person.code}] ${person.name}</strong> | إجمالي أيام الدورة: <strong>${totalCycleDays}</strong> | 🟢 أيام الحضور: <span style="color:var(--success);">${daysPresent}</span> | 🔴 مرات الانصراف: <span style="color:var(--gold);">${daysCheckout}</span>`;
+            }
+
+            if (tableWrap) {
+                tableWrap.innerHTML = `
+                    <table class="monthly-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>ميعاد الحضور</th>
+                                <th>ميعاد الانصراف</th>
+                                <th>الموقع</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                `;
+            }
+        };
+
+        function renderAdminLeavesList() {
+            const pendingContainer = document.getElementById("adminPendingLeavesList");
+            const historyContainer = document.getElementById("adminAllLeavesHistoryList");
+            if (!pendingContainer || !historyContainer) return;
+
+            const sortedLeaves = [...allLeaves].sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+            const pendingLeaves = sortedLeaves.filter(l => l.adminStatus !== "مرفوض" && l.adminStatus !== "معتمد");
+
+            if (pendingLeaves.length === 0) {
+                pendingContainer.innerHTML = '<div class="list-item" style="text-align:center; color:var(--muted);">لا توجد طلبات إجازات معلقة حالياً.</div>';
+            } else {
+                pendingContainer.innerHTML = "";
+                pendingLeaves.forEach(leave => {
+                    const div = document.createElement("div");
+                    div.className = "list-item";
+                    div.innerHTML = `
+                        <div>
+                            <strong>[${leave.code}] ${leave.name}</strong> (${leave.role}) — 📌 الموقع: <strong>${leave.site}</strong><br>
+                            📅 الفترة: ${leave.leaveDate}<br>
+                            📝 السبب: ${leave.reason}<br>
+                            <span style="font-size:11.5px; color:var(--accent);">الحالة: <strong>${leave.adminStatus}</strong></span>
+                        </div>
+                        <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="btn btn-green btn-sm" style="margin:0;" onclick="adminLeaveAction('${leave.leaveId}', 'معتمد')">✔️ اعتماد</button>
+                            <button class="btn btn-red btn-sm" style="margin:0;" onclick="adminLeaveAction('${leave.leaveId}', 'مرفوض')">❌ رفض وإخفاء من الطلبات</button>
+                        </div>
+                    `;
+                    pendingContainer.appendChild(div);
+                });
+            }
+
+            if (sortedLeaves.length === 0) {
+                historyContainer.innerHTML = '<div class="list-item" style="text-align:center; color:var(--muted);">لا يوجد سجل إجازات حتى الآن.</div>';
+            } else {
+                historyContainer.innerHTML = "";
+                sortedLeaves.forEach(leave => {
+                    let badgeStyle = "background:#fef3c7; color:#92400e;";
+                    if (leave.adminStatus === "معتمد") badgeStyle = "background:#dcfce7; color:#166534;";
+                    else if (leave.adminStatus === "مرفوض") badgeStyle = "background:#fee2e2; color:#991b1b;";
+
+                    const div = document.createElement("div");
+                    div.className = "list-item";
+                    div.innerHTML = `
+                        <div>
+                            <strong>[${leave.code}] ${leave.name}</strong> (${leave.role}) — 📌 الموقع: <strong>${leave.site}</strong><br>
+                            📅 الفترة: ${leave.leaveDate} &nbsp;|&nbsp; 🗓️ تاريخ التقديم: ${leave.submittedAt || "—"}<br>
+                            📝 السبب: ${leave.reason}<br>
+                            <div style="margin-top:6px;">
+                                الإجراء المتخذ: <span style="padding:2px 8px; border-radius:6px; font-weight:700; ${badgeStyle}">${leave.adminStatus}</span>
+                            </div>
+                            ${leave.adminNote ? `<div style="margin-top:4px; color:#334155;">💬 <strong>ملاحظة الإدارة:</strong> ${leave.adminNote}</div>` : ``}
+                        </div>
+                    `;
+                    historyContainer.appendChild(div);
+                });
+            }
+        }
+
+        window.adminLeaveAction = async function(leaveId, decision) {
+            const leave = allLeaves.find(l => l.leaveId === leaveId);
+            if (!leave) return;
+            const noteInput = prompt(`ملاحظة اختيارية عند (${decision}) الإجازة (يمكن تركها فارغة):`, leave.adminNote || "");
+            if (noteInput === null) return;
+
+            const updatedRecord = {
+                ...leave,
+                adminStatus: decision,
+                adminNote: noteInput.trim(),
+                decisionAt: getLocalDateStr(getAppNow())
+            };
+            allLeaves = mergeByKey(allLeaves, [updatedRecord], "leaveId");
+            renderAdminLeavesList();
+            window.onEmployeeSelected();
+
+            try {
+                await postToGoogle({ action: "upsertLeave", record: updatedRecord });
+                alert(decision === "مرفوض"
+                    ? "✅ تم رفض الإجازة وإخفاؤها من قائمة الطلبات المعلقة مع إبقاؤها محفوظة في السجل."
+                    : `✅ تم تثبيت حالة الإجازة إلى (${decision}) بنجاح.`
+                );
+            } catch (e) {
+                alert("❌ تعذر تحديث حالة الإجازة في جوجل.");
+            }
+        };
+
+        window.renderStaffManageList = function() {
+            const filterSite = document.getElementById("manageSiteFilter").value;
+            const container = document.getElementById("staffManageList");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const filtered = filterSite === "الكل" ? allStaff : allStaff.filter(s => sanitizeStaffSite(s.site) === filterSite);
+            filtered.forEach(person => {
+                const cleanSite = sanitizeStaffSite(person.site);
+                const metaLabel = cleanSite ? `(${person.role} - ${cleanSite})` : `(${person.role})`;
+                const div = document.createElement("div");
+                div.className = "list-item";
+                div.innerHTML = `
+                    <div><strong>[${person.code}]</strong> ${person.name} <span style="color:var(--muted); font-size:11px;">${metaLabel}</span></div>
+                    <button class="btn btn-red btn-sm" style="margin:0; padding:4px 8px;" onclick="deleteStaffMember('${person.code}')">🗑️ حذف</button>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.addNewStaff = async function() {
+            const name = document.getElementById("newStaffName").value.trim();
+            const role = document.getElementById("newStaffRole").value;
+            const site = sanitizeStaffSite(document.getElementById("newStaffSite").value);
+            if (!name) { alert("أدخل اسم الفرد أولاً."); return; }
+
+            let prefix = "SEC-";
+            if (ASSISTANT_ROLES.includes(role)) prefix = "AST-";
+            else if (SUPERVISOR_ROLES.includes(role)) prefix = "SUP-";
+
+            const code = generateNextStaffCode(prefix, allStaff);
+            const record = { code, name, role, site };
+            allStaff = mergeByKey(allStaff, [record], "code");
+            populateStaffDropdown(allStaff);
+            populateMonthlyStaffDropdown(allStaff);
+            renderStaffManageList();
+            renderAttendanceReport();
+
+            try {
+                await postToGoogle({ action: "upsertStaff", record });
+                alert(`✅ تم حفظ وتثبيت إضافة الفرد (${name}) بالكود (${code}) بنجاح.`);
+                document.getElementById("newStaffName").value = "";
+            } catch (e) {
+                alert("❌ تعذر إضافة الفرد في جوجل.");
+            }
+        };
+
+        window.deleteStaffMember = async function(code) {
+            if (!confirm(`هل أنت متأكد من حذف الفرد بالكود (${code})؟`)) return;
+            allStaff = allStaff.filter(s => String(s.code) !== String(code));
+            populateStaffDropdown(allStaff);
+            populateMonthlyStaffDropdown(allStaff);
+            renderStaffManageList();
+            renderAttendanceReport();
+
+            try {
+                await postToGoogle({ action: "deleteStaff", code });
+                alert("🗑️ تم حذف الفرد وتحديث القوة بنجاح.");
+            } catch (e) {
+                alert("❌ تعذر حذف الفرد من جوجل.");
+            }
+        };
+
+        window.updateDailyDirectives = async function() {
+            const tip = document.getElementById("adminTipInput").value.trim();
+            const scenario = document.getElementById("adminScenarioInput").value.trim();
+            if (tip) document.getElementById("dailyTip").textContent = tip;
+            if (scenario) document.getElementById("dailyScenario").textContent = "موقف اليوم: " + scenario;
+
+            try {
+                await postToGoogle({ action: "updateSettings", tip, scenario });
+                alert("💾 تم حفظ وتثبيت التوجيهات وموقف اليوم في جوجل بنجاح.");
+            } catch (e) {
+                alert("❌ تعذر تحديث التوجيهات في جوجل.");
+            }
+        };
+
+        let clickCounter = 0;
+        window.unlockAdmin = function() {
+            clickCounter++;
+            if (clickCounter >= 5) {
+                clickCounter = 0;
+                const pin = prompt("أدخل الرقم السري لسيادة المقدم / محمد مسعد:");
+                if (pin === ADMIN_PIN) {
+                    document.getElementById("staffView").style.display = "none";
+                    document.getElementById("adminView").style.display = "block";
+                    refreshFromGoogle(false);
+                    renderAttendanceReport();
+                    renderMonthlyEmployeeReport();
+                    renderAdminLeavesList();
+                } else if (pin !== null) { alert("رقم خاطئ"); }
+            }
+        };
+        window.backToStaffView = function() {
+            document.getElementById("adminView").style.display = "none";
+            document.getElementById("staffView").style.display = "block";
+        };
+        window.switchAdminTab = function(tabId, btn) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            btn.classList.add("active");
+        };
+    </script>
+</body>
+</html>
